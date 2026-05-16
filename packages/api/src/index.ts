@@ -1,15 +1,9 @@
 // API package index
-export * from './server.js';
+export * from "./server.js";
 
-// Re-export core types for consumers (e.g. apps)
-export type { 
-  User, 
-  Assignment, 
-  WorkPlace, 
-  Workspace, 
-  MappingRun 
-} from "@epios/domain";
+// Re-export core types and values for consumers (e.g. apps)
+export type { User, MappingRun } from "@epios/domain";
 
-export type {
-  McpRequestSchema
-} from "@epios/infrastructure-mcp";
+export { Assignment, WorkPlace, Workspace } from "@epios/domain";
+
+export { McpRequestSchema } from "@epios/infrastructure-mcp";

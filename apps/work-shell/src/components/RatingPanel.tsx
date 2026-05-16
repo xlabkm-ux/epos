@@ -230,4 +230,3 @@ export const RatingPanel: React.FC<{ nodeId: string }> = ({ nodeId }) => {
     </div>
   );
 };
-

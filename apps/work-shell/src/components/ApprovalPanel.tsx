@@ -1,11 +1,6 @@
 import { API_BASE_URL } from "../api-config";
 import React, { useState, useEffect } from "react";
-import {
-  ShieldCheck,
-  CheckCircle,
-  XCircle,
-  Info,
-} from "lucide-react";
+import { ShieldCheck, CheckCircle, XCircle, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSecurity } from "../context/SecurityContext";
 

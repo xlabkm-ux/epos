@@ -32,11 +32,11 @@ services:
       postgres:
         condition: service_healthy
 
-  demo-shell:
+  work-shell:
     build:
       context: .
-      target: demo-shell
-    container_name: epios-demo-shell
+      target: work-shell
+    container_name: epios-work-shell
     restart: unless-stopped
     ports:
       - "5173:80"

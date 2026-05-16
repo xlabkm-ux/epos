@@ -21,8 +21,8 @@ EXPOSE 3000
 CMD ["sh", "-c", "pnpm --filter @epios/infrastructure-postgres migrate && pnpm --filter @epios/api start"]
 
 # Stage 4: Demo Shell
-FROM nginx:stable-alpine AS demo-shell
-COPY --from=build /app/apps/demo-shell/dist /usr/share/nginx/html
+FROM nginx:stable-alpine AS work-shell
+COPY --from=build /app/apps/work-shell/dist /usr/share/nginx/html
 # Basic SPA config
 RUN echo 'server { \
     listen 80; \

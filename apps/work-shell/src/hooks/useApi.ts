@@ -13,7 +13,7 @@ export function useApi<T>(path: string, interval?: number) {
   const fetchData = useCallback(async () => {
     try {
       const headers: Record<string, string> = {
-        "Accept": "application/json",
+        Accept: "application/json",
       };
       if (currentUser) {
         headers["x-user-id"] = currentUser.id;
@@ -22,7 +22,9 @@ export function useApi<T>(path: string, interval?: number) {
         headers["x-workplace-id"] = activeWorkplace.id;
       }
 
-      const response = await fetch(`${API_BASE_URL}${pathRef.current}`, { headers });
+      const response = await fetch(`${API_BASE_URL}${pathRef.current}`, {
+        headers,
+      });
       if (!response.ok) {
         throw new Error(`API Error: ${response.statusText}`);
       }

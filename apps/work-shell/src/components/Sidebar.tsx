@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { Workspace } from "@epios/api";
 import { API_BASE_URL } from "../api-config";
 
-
 // Refactored Components
 import { Modal } from "./Modal";
 import { SidebarItem } from "./SidebarItem";
@@ -83,9 +82,6 @@ const Sidebar: React.FC = () => {
       window.removeEventListener("mouseup", stopResizing);
     };
   }, [resize, stopResizing]);
-
-
-
 
   const handleAction = async (ws: Workspace, action: string) => {
     if (action === "share") {
@@ -302,7 +298,6 @@ const Sidebar: React.FC = () => {
             }
           />
 
-
           {/* ── Workspaces List (Pinned first, no headers) ── */}
           <div
             style={{
@@ -365,28 +360,75 @@ const Sidebar: React.FC = () => {
         >
           {/* User Status Line (Position > RM > Role) */}
           {!isCollapsed && currentUser && (
-            <div style={{ 
-              padding: "0.85rem 1rem", 
-              background: "rgba(255,255,255,0.03)", 
-              borderRadius: "16px", 
-              marginBottom: "0.75rem",
-              border: "1px solid rgba(255,255,255,0.06)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-            }}>
-              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "6px" }}>
-                 <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#9ece6a" }} />
-                 {currentUser.username}
+            <div
+              style={{
+                padding: "0.85rem 1rem",
+                background: "rgba(255,255,255,0.03)",
+                borderRadius: "16px",
+                marginBottom: "0.75rem",
+                border: "1px solid rgba(255,255,255,0.06)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  color: "var(--text-main)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: "#9ece6a",
+                  }}
+                />
+                {currentUser.username}
               </div>
-              <div style={{ fontSize: "0.65rem", color: "var(--text-dim)", marginTop: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                {currentUser.username.toLowerCase().includes("admin") ? "Администратор" : "Ведущий архитектор"}
+              <div
+                style={{
+                  fontSize: "0.65rem",
+                  color: "var(--text-dim)",
+                  marginTop: "4px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {currentUser.username.toLowerCase().includes("admin")
+                  ? "Администратор"
+                  : "Ведущий архитектор"}
               </div>
-              
-              <div style={{ margin: "8px 0", height: "1px", background: "rgba(255,255,255,0.05)" }} />
 
-              <div style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 600 }}>
-                {workspaces.find(ws => ws.id === selectedWorkspaceId)?.name || "Demo Workspace"}
+              <div
+                style={{
+                  margin: "8px 0",
+                  height: "1px",
+                  background: "rgba(255,255,255,0.05)",
+                }}
+              />
+
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  color: "var(--primary)",
+                  fontWeight: 600,
+                }}
+              >
+                {workspaces.find((ws) => ws.id === selectedWorkspaceId)
+                  ?.title || "Demo Workspace"}
               </div>
-              <div style={{ fontSize: "0.65rem", color: "var(--text-dim)", opacity: 0.8 }}>
+              <div
+                style={{
+                  fontSize: "0.65rem",
+                  color: "var(--text-dim)",
+                  opacity: 0.8,
+                }}
+              >
                 {currentUser.role === "approver" ? "Владелец РМ" : "Рецензент"}
               </div>
             </div>
@@ -466,9 +508,9 @@ const Sidebar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <SettingsModal 
-        isOpen={showSettings} 
-        onClose={() => setShowSettings(false)} 
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
       />
     </>
   );

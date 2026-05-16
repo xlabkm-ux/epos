@@ -32,14 +32,20 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
     const saved = localStorage.getItem("currentUser");
     return saved ? JSON.parse(saved) : null;
   });
-  const [activeWorkplaceId, setActiveWorkplaceId] = useState<string | null>(() => {
-    return localStorage.getItem("activeWorkplaceId");
-  });
-  const [availableAssignments, setAvailableAssignments] = useState<Assignment[]>([]);
+  const [activeWorkplaceId, setActiveWorkplaceId] = useState<string | null>(
+    () => {
+      return localStorage.getItem("activeWorkplaceId");
+    },
+  );
+  const [availableAssignments, setAvailableAssignments] = useState<
+    Assignment[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const activeWorkplace = useMemo(() => {
-    const assignment = availableAssignments.find(a => a.id === activeWorkplaceId);
+    const assignment = availableAssignments.find(
+      (a) => a.id === activeWorkplaceId,
+    );
     return assignment ? new WorkPlace(assignment) : null;
   }, [activeWorkplaceId, availableAssignments]);
 
@@ -74,16 +80,24 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
       if (activeWorkplaceId) {
         headers["x-workplace-id"] = activeWorkplaceId;
       }
-      const response = await fetch(`${API_BASE_URL}/api/v1/identity/assignments`, {
-        headers
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/identity/assignments`,
+        {
+          headers,
+        },
+      );
       const data = await response.json();
       if (data && Array.isArray(data.assignments)) {
         setAvailableAssignments(data.assignments);
-        
+
         // If no active WP or active WP not in list, pick first
         if (data.assignments.length > 0) {
-          if (!activeWorkplaceId || !data.assignments.find((a: Assignment) => a.id === activeWorkplaceId)) {
+          if (
+            !activeWorkplaceId ||
+            !data.assignments.find(
+              (a: Assignment) => a.id === activeWorkplaceId,
+            )
+          ) {
             switchWorkplace(data.assignments[0].id);
           }
         }
@@ -103,7 +117,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
         headers["x-workplace-id"] = activeWorkplaceId;
       }
       const response = await fetch(`${API_BASE_URL}/api/v1/security/me`, {
-        headers
+        headers,
       });
       const data = await response.json();
       login(data.user);
@@ -122,16 +136,16 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <SecurityContext.Provider
-      value={{ 
-        currentUser, 
-        activeWorkplace, 
-        availableAssignments, 
-        setCurrentUserId, 
+      value={{
+        currentUser,
+        activeWorkplace,
+        availableAssignments,
+        setCurrentUserId,
         switchWorkplace,
-        login, 
-        logout, 
+        login,
+        logout,
         isLoading,
-        refreshAssignments
+        refreshAssignments,
       }}
     >
       {children}

@@ -1,2 +1,2 @@
 @echo off
-pnpm --filter demo-shell dev
+pnpm --filter @epios/work-shell dev

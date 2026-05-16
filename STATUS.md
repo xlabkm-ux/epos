@@ -54,7 +54,7 @@
 - [x] Полный переход на PostgreSQL для всех продуктовых сред.
 
 ### Спринт 6: Architecture Boundary Enforcement & Clean Build (Завершено)
-- [x] **Устранение нарушений `no-external-to-internal-apps`:** Перевести все прямые импорты из `@epios/domain` и `@epios/infrastructure-mcp` в компонентах `demo-shell` на публичный API-слой (`@epios/api`), либо создать выделенный контрактный пакет `@epios/shared-types` для переиспользуемых типов.
+- [x] **Устранение нарушений `no-external-to-internal-apps`:** Перевести все прямые импорты из `@epios/domain` и `@epios/infrastructure-mcp` в компонентах `work-shell` на публичный API-слой (`@epios/api`), либо создать выделенный контрактный пакет `@epios/shared-types` для переиспользуемых типов.
   - `WorkspaceContext.tsx` → `@epios/domain` (типы Workspace)
   - `SecurityContext.tsx` → `@epios/domain` (типы Security/User)
   - `WorkspaceRoom.tsx` → `@epios/domain` (типы Workspace)
@@ -67,7 +67,16 @@
 - [x] **Ужесточение правила `no-external-to-internal-apps`:** Повысить severity с `warn` на `error` в `.dependency-cruiser.cjs` после завершения рефакторинга для предотвращения будущих регрессий.
 - [x] **Целевой результат:** `depcruise` проходит с 0 нарушениями (0 errors, 2 warnings - orphans ignored).
 
----
+### Спринт 7: Shell Rebranding & Production Identity (Завершено)
+- [x] **Rebranding Directory**: Переименовать `apps/demo-shell` в `apps/work-shell` для отражения продуктового статуса.
+- [x] **Dependency Update**: Обновить `package.json`, `pnpm-lock.yaml` и внутренние ссылки в монорепозитории.
+- [x] **Config Migration**: Перенастроить `dependency-cruiser`, `turbo` и CI/CD скрипты под новые пути.
+- [x] **Docs Alignment**: Обновить `PROJECT_MAP.md`, `AGENT.md` и все регламенты, ссылающиеся на `work-shell`.
+- [x] **QA Gate G2-G8**: Прохождение всех гейтов качества под новым именем приложения.
+
+### Спринт 8: Identity & Persona Transition (Запланировано)
+- [ ] Интеграция RoleSwitcher в Sidebar для управления контекстом Identity.
+- [ ] Реализация смены Persona (ActorRef) в реальном времени.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 🏗️ Infrastructure & Build
 - [ ] `pnpm build` passes at the root.
-- [ ] `docker build` succeeds for both `api` and `demo-shell` targets.
+- [ ] `docker build` succeeds for both `api` and `work-shell` targets.
 - [ ] `docker compose up` starts all services without errors.
 - [ ] Healthchecks for Postgres and API are passing.
 

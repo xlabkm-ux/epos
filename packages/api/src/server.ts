@@ -147,7 +147,14 @@ export async function buildServer(deps: ServerDependencies = {}) {
   app.register(cors, {
     origin: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-user-id", "X-User-Id", "Accept", "Origin"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-user-id",
+      "X-User-Id",
+      "Accept",
+      "Origin",
+    ],
     credentials: true,
   });
 
@@ -193,13 +200,41 @@ export async function buildServer(deps: ServerDependencies = {}) {
     sourceRepo = deps.sourceRepo ?? new InMemorySourceRepository(mock.sources);
     ratingRepo = deps.ratingRepo ?? new InMemoryRatingRepository();
     identityRepo = deps.identityRepo ?? new InMemoryIdentityRepository();
-    
+
     // Initialize mock users
     const mockUsers: User[] = [
-      { id: "admin-1", username: "admin", role: "admin", email: "admin@epios.ai", isActive: true, createdAt: new Date() },
-      { id: "architect-1", username: "architect", role: "reviewer", email: "arch@epios.ai", isActive: true, createdAt: new Date() },
-      { id: "analyst-1", username: "analyst", role: "contributor", email: "analyst@epios.ai", isActive: true, createdAt: new Date() },
-      { id: "observer-1", username: "observer", role: "observer", email: "obs@epios.ai", isActive: true, createdAt: new Date() },
+      {
+        id: "admin-1",
+        username: "admin",
+        role: "admin",
+        email: "admin@epios.ai",
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "architect-1",
+        username: "architect",
+        role: "reviewer",
+        email: "arch@epios.ai",
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "analyst-1",
+        username: "analyst",
+        role: "contributor",
+        email: "analyst@epios.ai",
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "observer-1",
+        username: "observer",
+        role: "observer",
+        email: "obs@epios.ai",
+        isActive: true,
+        createdAt: new Date(),
+      },
     ];
     for (const u of mockUsers) await identityRepo.save(u);
 
@@ -213,7 +248,7 @@ export async function buildServer(deps: ServerDependencies = {}) {
     artifactRepo = new InMemoryArtifactRepository();
     decisionRepo = new InMemoryDecisionRepository();
     approvalRepo = new InMemoryApprovalRepository();
-    
+
     // Initialize mock org structure
     const mockUnits: OrgUnit[] = [
       { id: "unit-1", name: "Governance Group" },
@@ -226,14 +261,32 @@ export async function buildServer(deps: ServerDependencies = {}) {
       { id: "pos-3", name: "Security Officer", level: 2 },
       { id: "pos-4", name: "Senior Analyst", level: 3 },
     ];
-    orgRepo = deps.orgRepo ?? new InMemoryOrgRepository(mockUnits, mockPositions);
+    orgRepo =
+      deps.orgRepo ?? new InMemoryOrgRepository(mockUnits, mockPositions);
 
     // Initialize mock assignments
     const mockAssignments = [
-      new Assignment({ id: "wp-1", userId: "admin-1", role: "owner", unitId: "unit-1", positionId: "pos-1", isActive: true, createdAt: new Date() }),
-      new Assignment({ id: "wp-2", userId: "architect-1", role: "reviewer", unitId: "unit-2", positionId: "pos-2", isActive: true, createdAt: new Date() }),
+      new Assignment({
+        id: "wp-1",
+        userId: "admin-1",
+        role: "owner",
+        unitId: "unit-1",
+        positionId: "pos-1",
+        isActive: true,
+        createdAt: new Date(),
+      }),
+      new Assignment({
+        id: "wp-2",
+        userId: "architect-1",
+        role: "reviewer",
+        unitId: "unit-2",
+        positionId: "pos-2",
+        isActive: true,
+        createdAt: new Date(),
+      }),
     ];
-    assignmentRepo = deps.assignmentRepo ?? new InMemoryAssignmentRepository(mockAssignments);
+    assignmentRepo =
+      deps.assignmentRepo ?? new InMemoryAssignmentRepository(mockAssignments);
     uowProvider = new InMemoryUnitOfWorkProvider(
       graphRepo,
       governanceRepo,
@@ -273,7 +326,8 @@ export async function buildServer(deps: ServerDependencies = {}) {
     decisionRepo = new PostgresDecisionRepository(db);
 
     approvalRepo = new PostgresApprovalRepository(db);
-    assignmentRepo = deps.assignmentRepo ?? new PostgresAssignmentRepository(db);
+    assignmentRepo =
+      deps.assignmentRepo ?? new PostgresAssignmentRepository(db);
     orgRepo = deps.orgRepo ?? new PostgresOrgRepository(db);
     uowProvider = new PostgresUnitOfWorkProvider(db);
   }
@@ -281,11 +335,15 @@ export async function buildServer(deps: ServerDependencies = {}) {
   const mcpRegistry = deps.mcpRegistry ?? new InMemoryMCPAppRegistry();
   const mcpBridge = deps.mcpBridge ?? new MockMCPBridge(mcpRegistry);
 
-  const security = deps.security ?? new MockSecurityService(identityRepo, assignmentRepo);
+  const security =
+    deps.security ?? new MockSecurityService(identityRepo, assignmentRepo);
 
   // S2: Ensure non-null repositories (repos are now guaranteed defined)
   const createWorkspaceUseCase = new CreateWorkspaceUseCase(workspaceRepo);
-  const listWorkspacesUseCase = new ListWorkspacesUseCase(workspaceRepo, security);
+  const listWorkspacesUseCase = new ListWorkspacesUseCase(
+    workspaceRepo,
+    security,
+  );
   const patchWorkspaceUseCase = new PatchWorkspaceUseCase(workspaceRepo);
   const addNodeUseCase = new AddNodeUseCase(workspaceRepo, graphRepo);
   const addEdgeUseCase = new AddEdgeUseCase(workspaceRepo, graphRepo);
@@ -320,13 +378,19 @@ export async function buildServer(deps: ServerDependencies = {}) {
     uowProvider,
     security,
   );
-  const resolveApprovalUseCase = new ResolveApprovalUseCase(uowProvider, security);
-  const applyArtifactPatchUseCase = new ApplyArtifactPatchUseCase(uowProvider, security);
+  const resolveApprovalUseCase = new ResolveApprovalUseCase(
+    uowProvider,
+    security,
+  );
+  const applyArtifactPatchUseCase = new ApplyArtifactPatchUseCase(
+    uowProvider,
+    security,
+  );
   const listArtifactPatchesUseCase = new ListArtifactPatchesUseCase(
     artifactRepo,
   );
   const listApprovalsUseCase = new ListApprovalsUseCase(approvalRepo);
-  
+
   // S2: Identity Governance Context
   const identityContext = new IdentityContext(
     identityRepo,
@@ -345,15 +409,17 @@ export async function buildServer(deps: ServerDependencies = {}) {
 
   // Security identity injection
   app.addHook("onRequest", async (request) => {
-    app.log.info(`[CORS-DEBUG] Method: ${request.method}, URL: ${request.url}, Headers: ${JSON.stringify(request.headers)}`);
-    
+    app.log.info(
+      `[CORS-DEBUG] Method: ${request.method}, URL: ${request.url}, Headers: ${JSON.stringify(request.headers)}`,
+    );
+
     let userId: string | undefined;
-    
+
     const authHeader = request.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
       try {
-        const decoded = await security.verifyToken(token);
+        const decoded = (await security.verifyToken(token)) as { id?: string };
         userId = decoded.id;
       } catch (e) {
         app.log.warn(`Token verification failed: ${e}`);
@@ -361,14 +427,18 @@ export async function buildServer(deps: ServerDependencies = {}) {
     }
 
     if (!userId) {
-      userId = (request.headers["x-user-id"] as string) || (request.headers["X-User-Id"] as string);
+      userId =
+        (request.headers["x-user-id"] as string) ||
+        (request.headers["X-User-Id"] as string);
     }
-    
+
     // Default to observer-1 only if no auth provided
     userId = userId || "observer-1";
-    
-    const workplaceId = (request.headers["x-workplace-id"] as string) || (request.headers["X-Workplace-Id"] as string);
-    
+
+    const workplaceId =
+      (request.headers["x-workplace-id"] as string) ||
+      (request.headers["X-Workplace-Id"] as string);
+
     const user = await identityRepo.findById(userId);
     (security as MockSecurityService).setCurrentUser(user);
     if (workplaceId) {

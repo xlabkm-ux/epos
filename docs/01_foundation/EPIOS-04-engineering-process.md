@@ -116,7 +116,7 @@ Recommended MVP workspace:
 ```text
 epistemic-os/
   apps/
-    demo-shell/
+    work-shell/
 
   packages/
     domain/
@@ -157,14 +157,14 @@ epistemic-os/
 | `infrastructure-runtime` | lightweight runner, future Temporal adapter boundary |
 | `observability` | trace schema, local logger, OTel-ready adapter |
 | `testing` | fixtures, contract tests, fake ports, seed data |
-| `demo-shell` | neutral Mission Room UI and MCP App host integration |
+| `work-shell` | neutral Mission Room UI and MCP App host integration |
 
 ### 4.2. Dependency Direction
 
 Allowed dependency direction:
 
 ```text
-domain ← ports ← application ← api ← demo-shell
+domain ← ports ← application ← api ← work-shell
 ports ← infrastructure-*
 ```
 
@@ -173,9 +173,9 @@ Prohibited:
 ```text
 domain → infrastructure
 application → provider SDK directly
-demo-shell → database repositories directly
+work-shell → database repositories directly
 MCP App → domain mutation directly
-infrastructure-postgres → demo-shell
+infrastructure-postgres → work-shell
 ```
 
 A dependency check should be added to CI by Week 2 or earlier.
@@ -412,7 +412,7 @@ area:domain
 area:application
 area:postgres
 area:api
-area:demo-shell
+area:work-shell
 area:mcp
 area:runtime
 area:evidence
@@ -641,7 +641,7 @@ Initial ownership model:
 /packages/infrastructure-postgres/ @backend-owner @data-owner
 /packages/infrastructure-mcp/      @security-owner @frontend-owner
 /packages/api/                    @backend-owner
-/apps/demo-shell/                 @frontend-owner @product-owner
+/apps/work-shell/                 @frontend-owner @product-owner
 /docs/01_architecture/            @architect
 /docs/02_adrs/                    @architect
 /docs/03_specs/                   @architect @backend-owner

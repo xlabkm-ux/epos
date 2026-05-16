@@ -240,7 +240,7 @@ function generateMap() {
   sections.push(mermaidDetailed);
   sections.push('');
 
-  sections.push('## 🎨 Архитектура UI Интерфейсов (demo-shell)');
+  sections.push('## 🎨 Архитектура UI Интерфейсов (work-shell)');
   sections.push('> Обобщенная концептуальная структура компонентов пользовательского интерфейса');
   sections.push('');
   const uiDiagram = `\`\`\`mermaid

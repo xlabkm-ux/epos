@@ -568,7 +568,10 @@ const GraphCanvasInner: React.FC = () => {
               if (selectedNodeId) {
                 const node = nodes.find((n) => n.id === selectedNodeId);
                 if (node) {
-                   setCenter(node.position.x + 110, node.position.y + 75, { zoom: 1, duration: 800 });
+                  setCenter(node.position.x + 110, node.position.y + 75, {
+                    zoom: 1,
+                    duration: 800,
+                  });
                 }
               }
             }}

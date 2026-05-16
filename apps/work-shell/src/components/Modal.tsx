@@ -9,7 +9,12 @@ interface ModalProps {
   width?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({ children, onClose, title, width = "480px" }) => {
+export const Modal: React.FC<ModalProps> = ({
+  children,
+  onClose,
+  title,
+  width = "480px",
+}) => {
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -60,7 +60,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@25.7.0)
 
-  apps/demo-shell:
+  apps/work-shell:
     dependencies:
       '@epios/api':
         specifier: workspace:*

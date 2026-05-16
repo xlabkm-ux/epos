@@ -12,8 +12,6 @@ import { API_BASE_URL } from "../api-config";
 import { useApi } from "../hooks/useApi";
 import { useSecurity } from "./SecurityContext";
 
-
-
 interface WorkspaceContextType {
   selectedWorkspaceId: string | null;
   setSelectedWorkspaceId: (id: string | null) => void;
@@ -35,7 +33,6 @@ interface WorkspaceContextType {
   restoreWorkspace: (id: string) => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
 }
-
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
   undefined,
@@ -110,8 +107,9 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const { activeWorkplace } = useSecurity();
-  const { data: fetchedWorkspaces, refresh: refreshWorkspacesApi } =
-    useApi<Workspace[]>("/workspaces", 30000); // Poll every 30s
+  const { data: fetchedWorkspaces, refresh: refreshWorkspacesApi } = useApi<
+    Workspace[]
+  >("/workspaces", 30000); // Poll every 30s
 
   // Sync fetched workspaces with state and local storage overrides
   useEffect(() => {
@@ -168,7 +166,6 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-
   return (
     <WorkspaceContext.Provider
       value={{
@@ -187,7 +184,6 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
         restoreWorkspace,
         refreshWorkspaces,
       }}
-
     >
       {children}
     </WorkspaceContext.Provider>

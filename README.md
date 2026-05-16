@@ -79,7 +79,7 @@ EPIOS follows a layered hexagonal architecture. The monorepo structure strictly 
 ```mermaid
 graph TD
     subgraph Apps [Interfaces Layer]
-        Shell[demo-shell: React/Vite]
+        Shell[work-shell: React/Vite]
     end
 
     subgraph Packages [Core Layers]
@@ -98,7 +98,7 @@ graph TD
 ```
 
 ### Physical Directory Mapping
-- **`apps/demo-shell`**: The primary "Mission Room" UI.
+- **`apps/work-shell`**: The primary "Mission Room" UI.
 - **`packages/domain`**: Pure business logic, entities (`EpistemicNode`), and invariants.
 - **`packages/application`**: Orchestration and use cases (e.g., `SubmitClaim`, `ApplyPatch`).
 - **`packages/api`**: HTTP interface and DTO validation.

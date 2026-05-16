@@ -7,10 +7,10 @@ export interface RequestOptions extends RequestInit {
 
 export async function secureFetch(path: string, options: RequestOptions = {}) {
   const { userId, workplaceId, ...fetchOptions } = options;
-  
+
   const headers = new Headers(fetchOptions.headers || {});
   headers.set("Accept", "application/json");
-  
+
   if (userId) {
     headers.set("x-user-id", userId);
   }
@@ -19,7 +19,7 @@ export async function secureFetch(path: string, options: RequestOptions = {}) {
   }
 
   const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
-  
+
   const response = await fetch(url, {
     ...fetchOptions,
     headers,

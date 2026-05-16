@@ -23,9 +23,7 @@ export const SourcePanel: React.FC<{ missionId: string }> = ({ missionId }) => {
 
   const fetchSources = async () => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/missions/${missionId}/sources`,
-      );
+      const res = await fetch(`${API_BASE_URL}/missions/${missionId}/sources`);
       if (res.ok) {
         const data = await res.json();
         setSources(data);
@@ -39,14 +37,11 @@ export const SourcePanel: React.FC<{ missionId: string }> = ({ missionId }) => {
     if (!newContent) return;
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/missions/${missionId}/sources`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: newType, content: newContent }),
-        },
-      );
+      const res = await fetch(`${API_BASE_URL}/missions/${missionId}/sources`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: newType, content: newContent }),
+      });
       if (res.ok) {
         const source = await res.json();
         setSources([...sources, source]);
@@ -228,4 +223,3 @@ export const SourcePanel: React.FC<{ missionId: string }> = ({ missionId }) => {
     </div>
   );
 };
-
