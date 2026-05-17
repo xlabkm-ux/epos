@@ -1,5 +1,4 @@
 // API package index
-export * from "./server.js";
 
 // Re-export core types and values for consumers (e.g. apps)
 export type { User, MappingRun } from "@epios/domain";
