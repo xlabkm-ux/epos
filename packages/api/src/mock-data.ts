@@ -29,55 +29,137 @@ function createWorkspaceEData(): {
   edges: EpistemicEdge[];
 } {
   const workspaceEId = "m5";
-  const nodes: EpistemicNodeProps[] = Array.from({ length: 50 }, (_, i) => ({
-    id: `ne${i + 1}`,
-    workspaceId: workspaceEId,
-    missionId: "mission-e",
-    type: (i % 3 === 0
-      ? "hypothesis"
-      : i % 2 === 0
-        ? "observation"
-        : "claim") as NodeType,
-    content: [
-      "Recursive depth instability detected in layer " + (i + 1),
-      "Gradient vanishing in cross-attention sub-block " + (i + 1),
-      "Entropy collapse observed at temperature T=" + (0.1 + i / 50).toFixed(2),
-      "Latent space fragmentation hypothesis #" + (i + 1),
-      "Empirical trace of neuron group " + (i + 1) + " firing rate saturation",
-      "Ablation study of attention head #" +
-        (i + 1) +
-        " reveals critical vulnerability",
-    ][i % 6],
-    strength: "moderate" as NodeStrength,
-    metadata: {},
-    version: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }));
+  const nodesProps: EpistemicNodeProps[] = [
+    {
+      id: "ne1",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "hypothesis",
+      content:
+        "Loss spike at iteration 14,200 is caused by gradient explosion in the early cross-attention layers.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ne2",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "observation",
+      content:
+        "Telemetry logs show layer 4-8 gradient norms exceeded float16 representation range (>65,500) just before divergence.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ne3",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "observation",
+      content:
+        "Attention weights in layer 6 collapsed to a delta function, focusing 99.8% of probability mass on the [PAD] token.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ne4",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "claim",
+      content:
+        "Switching from standard LayerNorm to RMSNorm with FP32 precision for accumulator variables prevents numeric overflow.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ne5",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "claim",
+      content:
+        "Reducing learning rate from 2e-5 to 5e-6 mitigates the loss spike but doubles training time.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ne6",
+      workspaceId: workspaceEId,
+      missionId: "mission-e",
+      type: "observation",
+      content:
+        "Re-running iteration 14,000-15,000 with FP32 RMSNorm successfully passed the checkpoint without loss divergence.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
 
-  const edges: EpistemicEdge[] = [];
-  for (let i = 0; i < 50; i++) {
-    const targets = [(i + 1) % 50, (i * 7 + 3) % 50, Math.floor(i / 5) * 5];
-
-    targets.forEach((targetIdx, j) => {
-      if (targetIdx !== i) {
-        edges.push({
-          id: `ee${i}-${j}`,
-          workspaceId: workspaceEId,
-          sourceNodeId: nodes[i].id,
-          targetNodeId: nodes[targetIdx].id,
-          type: ["supports", "contradicts", "refines", "addresses"][
-            (i + j) % 4
-          ] as EpistemicEdgeType,
-          metadata: {},
-          createdAt: new Date(),
-        });
-      }
-    });
-  }
+  const edges: EpistemicEdge[] = [
+    {
+      id: "ee5-1",
+      workspaceId: workspaceEId,
+      sourceNodeId: "ne2",
+      targetNodeId: "ne1",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ee5-2",
+      workspaceId: workspaceEId,
+      sourceNodeId: "ne3",
+      targetNodeId: "ne1",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ee5-3",
+      workspaceId: workspaceEId,
+      sourceNodeId: "ne4",
+      targetNodeId: "ne1",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ee5-4",
+      workspaceId: workspaceEId,
+      sourceNodeId: "ne5",
+      targetNodeId: "ne1",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ee5-5",
+      workspaceId: workspaceEId,
+      sourceNodeId: "ne6",
+      targetNodeId: "ne4",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+  ];
 
   return {
-    nodes: nodes.map((n) => new EpistemicNode(n as EpistemicNodeProps)),
+    nodes: nodesProps.map((n) => new EpistemicNode(n)),
     edges,
   };
 }
@@ -86,127 +168,415 @@ function createRussianDemoData(): {
   nodes: EpistemicNode[];
   edges: EpistemicEdge[];
 } {
-  const nodes: EpistemicNodeProps[] = [
-    // m7: 10 nodes
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `ws7-n${i}`,
+  const nodesProps: EpistemicNodeProps[] = [
+    // m7: Демо: Микросервисная архитектура
+    {
+      id: "ws7-n1",
       workspaceId: "m7",
       missionId: "mission-7",
-      type: (i % 3 === 0
-        ? "hypothesis"
-        : i % 2 === 0
-          ? "observation"
-          : "claim") as NodeType,
-      content: [
-        "Микросервисы повышают масштабируемость системы",
-        "Сложность отладки в распределенных системах увеличивается",
-        "Необходимость внедрения распределенной трассировки (Jaeger/Zipkin)",
-        "Выбор протокола: gRPC обеспечивает лучшую производительность чем REST",
-        "Использование Kafka для асинхронного взаимодействия сервисов",
-        "Риск рассогласованности данных (Eventual Consistency)",
-        "Паттерн Saga для управления распределенными транзакциями",
-        "Централизованное логирование (ELK Stack) критично для эксплуатации",
-        "Kubernetes как стандарт оркестрации контейнеров",
-        "Мониторинг через Prometheus и Grafana для контроля SLA",
-      ][i],
-      strength: "moderate" as NodeStrength,
+      type: "hypothesis",
+      content:
+        "Переход на микросервисную архитектуру повысит масштабируемость системы и скорость доставки фич независимыми командами.",
+      strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-    })),
-    // m8: 20 nodes
-    ...Array.from({ length: 20 }, (_, i) => ({
-      id: `ws8-n${i}`,
+    },
+    {
+      id: "ws7-n2",
+      workspaceId: "m7",
+      missionId: "mission-7",
+      type: "claim",
+      content:
+        "Микросервисы увеличивают задержку (network latency) из-за множественных межсервисных вызовов и сериализации данных.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws7-n3",
+      workspaceId: "m7",
+      missionId: "mission-7",
+      type: "claim",
+      content:
+        "Необходимость поддержки распределенных транзакций создает риск рассогласованности данных (Eventual Consistency).",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws7-n4",
+      workspaceId: "m7",
+      missionId: "mission-7",
+      type: "observation",
+      content:
+        "Анализ логов монолита показал, что 80% нагрузки приходится на модуль каталога, который блокирует масштабирование других модулей.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws7-n5",
+      workspaceId: "m7",
+      missionId: "mission-7",
+      type: "claim",
+      content:
+        "Паттерн Saga и брокер сообщений Kafka позволят асинхронно синхронизировать состояние без блокирующих вызовов.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws7-n6",
+      workspaceId: "m7",
+      missionId: "mission-7",
+      type: "observation",
+      content:
+        "Прототипирование на gRPC показало задержку всего 1.2мс на вызов, что полностью укладывается в лимит SLA в 10мс.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // m8: Демо: Облачная миграция
+    {
+      id: "ws8-n1",
       workspaceId: "m8",
       missionId: "mission-8",
-      type: (i % 3 === 0
-        ? "hypothesis"
-        : i % 2 === 0
-          ? "observation"
-          : "claim") as NodeType,
+      type: "hypothesis",
       content:
-        [
-          "Облачные провайдеры снижают капитальные затраты (CAPEX)",
-          "Безопасность данных в публичном облаке вызывает опасения",
-          "Гибридное облако — оптимальный баланс для энтерпрайза",
-          "Задержка сети (Latency) между on-prem и облаком",
-          "Автоматическое масштабирование (Auto-scaling) экономит ресурсы",
-          "Vendor lock-in: сложность миграции между провайдерами",
-          "Terraform для управления инфраструктурой как кодом (IaC)",
-          "Облачные базы данных (Managed SQL) упрощают администрирование",
-          "Стоимость исходящего трафика (Egress) может быть высокой",
-          "Serverless (Lambda/Cloud Functions) для событийных задач",
-        ][i % 10] + ` (Аргумент #${i + 1})`,
-      strength: "moderate" as NodeStrength,
+        "Миграция legacy-биллинга в публичное облако снизит капитальные затраты (CAPEX) на 35% за счет авто-масштабирования.",
+      strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-    })),
-    // m9: 50 nodes
-    ...Array.from({ length: 50 }, (_, i) => ({
-      id: `ws9-n${i}`,
+    },
+    {
+      id: "ws8-n2",
+      workspaceId: "m8",
+      missionId: "mission-8",
+      type: "claim",
+      content:
+        "Задержка сети (network latency) между on-prem базой данных пользователей и облачным биллингом нарушит SLA транзакций.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws8-n3",
+      workspaceId: "m8",
+      missionId: "mission-8",
+      type: "claim",
+      content:
+        "Риск жесткой привязки к облачному провайдеру (Vendor Lock-in) усложнит потенциальный перенос систем в будущем.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws8-n4",
+      workspaceId: "m8",
+      missionId: "mission-8",
+      type: "observation",
+      content:
+        "Аудит серверов показал среднюю утилизацию CPU в on-prem дата-центре всего на уровне 12%, при этом затраты на железо фиксированы.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws8-n5",
+      workspaceId: "m8",
+      missionId: "mission-8",
+      type: "claim",
+      content:
+        "Использование Terraform для описания инфраструктуры как кода (IaC) обеспечивает независимость от конкретного API облака.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws8-n6",
+      workspaceId: "m8",
+      missionId: "mission-8",
+      type: "claim",
+      content:
+        "Развертывание локального кэша сессий пользователей в облаке (Redis) снизит межсетевой трафик на 90%.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // m9: Демо: Система лояльности
+    {
+      id: "ws9-n1",
       workspaceId: "m9",
       missionId: "mission-9",
-      type: (i % 3 === 0
-        ? "hypothesis"
-        : i % 2 === 0
-          ? "observation"
-          : "claim") as NodeType,
+      type: "hypothesis",
       content:
-        [
-          "Бонусные баллы должны сгорать через 12 месяцев",
-          "Интеграция with кассовым ПО (POS) — критическая точка отказа",
-          "Мобильное приложение как основной канал взаимодействия",
-          "Персонализация предложений на основе ML-моделей",
-          "Риск фрода (мошенничества) with начислением баллов",
-          "Высокая нагрузка в периоды распродаж (Черная пятница)",
-          "Соответствие ФЗ-152 о персональных данных",
-          "Омниканальность: единый баланс в онлайне и офлайне",
-          "A/B тесты механик лояльности для повышения конверсии",
-          "Партнерская сеть: возможность тратить баллы у партнеров",
-        ][i % 10] + ` (Деталь #${i + 1})`,
-      strength: "strong" as NodeStrength,
+        "Сгорание неиспользованных бонусных баллов через 12 месяцев снизит финансовые обязательства компании на балансе.",
+      strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
-    })),
+    },
+    {
+      id: "ws9-n2",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "claim",
+      content:
+        "Резкое списание баллов вызовет негативную реакцию лояльных клиентов и снизит их retention rate.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws9-n3",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "claim",
+      content:
+        "Организация интеграции с кассовым ПО (POS) в режиме реального времени является критической точкой отказа при пиковых нагрузках.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws9-n4",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "observation",
+      content:
+        "Статистика показывает, что 35% клиентов копят баллы более года для совершения одной крупной покупки.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws9-n5",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "claim",
+      content:
+        "Внедрение push-уведомлений за 30 дней до списания баллов стимулирует повторные покупки и нейтрализует негатив.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws9-n6",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "claim",
+      content:
+        "Асинхронная очередь сообщений (RabbitMQ) для обработки транзакций лояльности защитит кассовые операции от сбоев.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "ws9-n7",
+      workspaceId: "m9",
+      missionId: "mission-9",
+      type: "observation",
+      content:
+        "Нагрузочное тестирование кассового API выявило задержки до 8 секунд при прямой синхронной записи баланса баллов.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   ];
 
   const edges: EpistemicEdge[] = [
-    ...Array.from({ length: 9 }, (_, i) => ({
-      id: `ws7-e${i}`,
+    // m7 connections
+    {
+      id: "ws7-e1",
       workspaceId: "m7",
-      sourceNodeId: `ws7-n${i}`,
-      targetNodeId: `ws7-n${i + 1}`,
-      type: (i % 3 === 0 ? "contradicts" : "supports") as EpistemicEdgeType,
+      sourceNodeId: "ws7-n4",
+      targetNodeId: "ws7-n1",
+      type: "supports",
       metadata: {},
       createdAt: new Date(),
-    })),
-    ...Array.from({ length: 19 }, (_, i) => ({
-      id: `ws8-e${i}`,
+    },
+    {
+      id: "ws7-e2",
+      workspaceId: "m7",
+      sourceNodeId: "ws7-n2",
+      targetNodeId: "ws7-n1",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws7-e3",
+      workspaceId: "m7",
+      sourceNodeId: "ws7-n3",
+      targetNodeId: "ws7-n2",
+      type: "refines",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws7-e4",
+      workspaceId: "m7",
+      sourceNodeId: "ws7-n5",
+      targetNodeId: "ws7-n3",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws7-e5",
+      workspaceId: "m7",
+      sourceNodeId: "ws7-n6",
+      targetNodeId: "ws7-n2",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // m8 connections
+    {
+      id: "ws8-e1",
       workspaceId: "m8",
-      sourceNodeId: `ws8-n${i + 1}`,
-      targetNodeId: `ws8-n0`,
-      type: (i % 2 === 0 ? "supports" : "contradicts") as EpistemicEdgeType,
+      sourceNodeId: "ws8-n4",
+      targetNodeId: "ws8-n1",
+      type: "supports",
       metadata: {},
       createdAt: new Date(),
-    })),
-    ...Array.from({ length: 50 }, (_, i) => ({
-      id: `ws9-e${i}`,
+    },
+    {
+      id: "ws8-e2",
+      workspaceId: "m8",
+      sourceNodeId: "ws8-n2",
+      targetNodeId: "ws8-n1",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws8-e3",
+      workspaceId: "m8",
+      sourceNodeId: "ws8-n3",
+      targetNodeId: "ws8-n1",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws8-e4",
+      workspaceId: "m8",
+      sourceNodeId: "ws8-n5",
+      targetNodeId: "ws8-n3",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws8-e5",
+      workspaceId: "m8",
+      sourceNodeId: "ws8-n6",
+      targetNodeId: "ws8-n2",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // m9 connections
+    {
+      id: "ws9-e1",
       workspaceId: "m9",
-      sourceNodeId: `ws9-n${i}`,
-      targetNodeId: `ws9-n${(i + 5) % 50}`,
-      type: (i % 3 === 0 ? "contradicts" : "supports") as EpistemicEdgeType,
+      sourceNodeId: "ws9-n2",
+      targetNodeId: "ws9-n1",
+      type: "contradicts",
       metadata: {},
       createdAt: new Date(),
-    })),
+    },
+    {
+      id: "ws9-e2",
+      workspaceId: "m9",
+      sourceNodeId: "ws9-n4",
+      targetNodeId: "ws9-n2",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws9-e3",
+      workspaceId: "m9",
+      sourceNodeId: "ws9-n5",
+      targetNodeId: "ws9-n2",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws9-e4",
+      workspaceId: "m9",
+      sourceNodeId: "ws9-n3",
+      targetNodeId: "ws9-n1",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws9-e5",
+      workspaceId: "m9",
+      sourceNodeId: "ws9-n7",
+      targetNodeId: "ws9-n3",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "ws9-e6",
+      workspaceId: "m9",
+      sourceNodeId: "ws9-n6",
+      targetNodeId: "ws9-n3",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
   ];
 
   return {
-    nodes: nodes.map((n) => new EpistemicNode(n as EpistemicNodeProps)),
+    nodes: nodesProps.map((n) => new EpistemicNode(n)),
     edges,
   };
 }
@@ -286,14 +656,14 @@ export function createMockData(): MockData {
     },
     {
       id: "m5",
-      title: "Scenario E: Neural Network Collapse",
+      title: "Scenario E: Transformer Loss Divergence",
       status: "running" as WorkspaceStatus,
       mode: "assisted" as WorkspaceMode,
       sensitivity: "internal" as WorkspaceSensitivity,
       version: 1,
       brief: {
-        goal: "Stress-test large-scale transformer stability",
-        successCriteria: ["Map 50 critical points"],
+        goal: "Analyze 70B parameter model training instability",
+        successCriteria: ["Identify gradient explosion root cause"],
         constraints: [],
         unknowns: [],
       },
@@ -310,7 +680,7 @@ export function createMockData(): MockData {
       version: 1,
       brief: {
         goal: "Review and finalize ADR for event-driven architecture",
-        successCriteria: ["Map critical points", "Narrow decision scope"],
+        successCriteria: ["Map core audit trade-offs"],
         constraints: [],
         unknowns: [],
       },
@@ -320,14 +690,14 @@ export function createMockData(): MockData {
     },
     {
       id: "m7",
-      title: "Демо: Микросервисы (10 нод)",
+      title: "Демо: Микросервисная архитектура",
       status: "running" as WorkspaceStatus,
       mode: "assisted" as WorkspaceMode,
       sensitivity: "internal" as WorkspaceSensitivity,
       version: 1,
       brief: {
         goal: "Оценка архитектурных рисков при переходе на микросервисы",
-        successCriteria: ["Выявить 5 рисков"],
+        successCriteria: ["Выявить ключевые риски и способы их миграции"],
         constraints: [],
         unknowns: [],
       },
@@ -337,14 +707,14 @@ export function createMockData(): MockData {
     },
     {
       id: "m8",
-      title: "Демо: Облачная миграция (20 нод)",
+      title: "Демо: Облачная миграция",
       status: "running" as WorkspaceStatus,
       mode: "assisted" as WorkspaceMode,
       sensitivity: "internal" as WorkspaceSensitivity,
       version: 1,
       brief: {
         goal: "Синтез стратегии переноса legacy-систем в облако",
-        successCriteria: ["Сформировать 3 стратегии"],
+        successCriteria: ["Сформировать целевую стратегию миграции"],
         constraints: [],
         unknowns: [],
       },
@@ -354,14 +724,14 @@ export function createMockData(): MockData {
     },
     {
       id: "m9",
-      title: "Демо: Система лояльности (50 нод)",
+      title: "Демо: Анализ системы лояльности",
       status: "running" as WorkspaceStatus,
       mode: "assisted" as WorkspaceMode,
       sensitivity: "internal" as WorkspaceSensitivity,
       version: 1,
       brief: {
         goal: "Глубокий анализ требований и противоречий новой системы",
-        successCriteria: ["Покрыть 50 аспектов системы"],
+        successCriteria: ["Покрыть ключевые риски бизнес-логики"],
         constraints: [],
         unknowns: [],
       },
@@ -372,14 +742,14 @@ export function createMockData(): MockData {
   ].map((p) => new Workspace(p as WorkspaceProps));
 
   const baseNodes: EpistemicNodeProps[] = [
-    // Scenario A
+    // Scenario A: Climate Research
     {
       id: "n1",
       workspaceId: "m1",
       missionId: "mission-1",
       type: "hypothesis",
       content:
-        "Arctic ice melt accelerates global sea level rise by 20% by 2050",
+        "Arctic ice melt will accelerate global sea level rise by 20% by 2050, threatening coastal megacities.",
       strength: "moderate",
       metadata: {},
       version: 1,
@@ -391,7 +761,8 @@ export function createMockData(): MockData {
       workspaceId: "m1",
       missionId: "mission-1",
       type: "observation",
-      content: "NOAA 2024 Report on Arctic Melt Rates",
+      content:
+        "NOAA 2024 Climate Report shows Arctic temperatures rising at 3x the global average.",
       strength: "strong",
       metadata: {},
       version: 1,
@@ -403,7 +774,8 @@ export function createMockData(): MockData {
       workspaceId: "m1",
       missionId: "mission-1",
       type: "observation",
-      content: "Sentinel-6 Satellite Altimetry Data",
+      content:
+        "Sentinel-6 satellite altimetry data reveals sea level rise acceleration of 4.5mm/year over the last decade.",
       strength: "strong",
       metadata: {},
       version: 1,
@@ -415,20 +787,49 @@ export function createMockData(): MockData {
       workspaceId: "m1",
       missionId: "mission-1",
       type: "claim",
-      content: "Melting rate exceeds previous IPPC models",
+      content:
+        "Melting rate of the Greenland Ice Sheet has exceeded the worst-case IPCC AR6 projections.",
       strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    // Scenario B
+    {
+      id: "n4-1",
+      workspaceId: "m1",
+      missionId: "mission-1",
+      type: "observation",
+      content:
+        "Recent ice core samples from Northeast Greenland show unprecedented summer melt layers.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n4-2",
+      workspaceId: "m1",
+      missionId: "mission-1",
+      type: "claim",
+      content:
+        "Coastal defense systems in Southeast Asia will require $100B in additional funding to mitigate 2050 risks.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // Scenario B: Crisis Response
     {
       id: "n5",
       workspaceId: "m2",
       missionId: "mission-2",
       type: "hypothesis",
-      content: "Suez blockage causes 2-week semiconductor delay",
+      content:
+        "A 2-week Suez Canal blockage will cause severe semiconductor stockouts in European automotive plants.",
       strength: "moderate",
       metadata: {},
       version: 1,
@@ -440,7 +841,8 @@ export function createMockData(): MockData {
       workspaceId: "m2",
       missionId: "mission-2",
       type: "observation",
-      content: "Port authority live congestion report",
+      content:
+        "Real-time port congestion reports show 320 container vessels currently anchored at the canal entrance.",
       strength: "strong",
       metadata: {},
       version: 1,
@@ -452,20 +854,49 @@ export function createMockData(): MockData {
       workspaceId: "m2",
       missionId: "mission-2",
       type: "claim",
-      content: "Reroute via Cape of Good Hope reduces delay risk",
+      content:
+        "Rerouting ships around the Cape of Good Hope adds 10-14 days to transit times and $400k in fuel costs per vessel.",
       strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    // Scenario C
+    {
+      id: "n7-1",
+      workspaceId: "m2",
+      missionId: "mission-2",
+      type: "claim",
+      content:
+        "Shifting critical semiconductor shipments to air freight is feasible but increases logistics costs by 400%.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n7-2",
+      workspaceId: "m2",
+      missionId: "mission-2",
+      type: "observation",
+      content:
+        "ASML and TSMC shipment schedules show a backlog of 4.2 million microcontrollers destined for Europe.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // Scenario C: AI Governance
     {
       id: "n8",
       workspaceId: "m3",
       missionId: "mission-3",
       type: "hypothesis",
-      content: "Mandatory human approval prevents runaway loops",
+      content:
+        "Mandatory human-in-the-loop (HITL) approval for all write operations prevents autonomous agent runaway loops.",
       strength: "strong",
       metadata: {},
       version: 1,
@@ -477,20 +908,62 @@ export function createMockData(): MockData {
       workspaceId: "m3",
       missionId: "mission-3",
       type: "claim",
-      content: "Adaptive thresholds minimize latency impact",
+      content:
+        "Full manual approval introduces significant latency, reducing agent operation efficiency by 75%.",
       strength: "moderate",
       metadata: {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    // Scenario D
+    {
+      id: "n9-1",
+      workspaceId: "m3",
+      missionId: "mission-3",
+      type: "claim",
+      content:
+        "Adaptive confidence-based gating (HITL triggered only below 85% confidence) balances safety and throughput.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n9-2",
+      workspaceId: "m3",
+      missionId: "mission-3",
+      type: "observation",
+      content:
+        "Log audits of 1,000 automated deployments show 98% of agent failures occur during database write operations.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n9-3",
+      workspaceId: "m3",
+      missionId: "mission-3",
+      type: "observation",
+      content:
+        "Benchmark testing of adaptive confidence gating shows a 90% reduction in human intervention with 0 safety incidents.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // Scenario D: Knowledge Synthesis
     {
       id: "n10",
       workspaceId: "m4",
       missionId: "mission-4",
       type: "observation",
-      content: "Transformer vs SSM Comparative Study 2025",
+      content:
+        "SSM models (e.g. Mamba) achieve linear O(N) computational complexity compared to Transformer's quadratic O(N^2).",
       strength: "strong",
       metadata: {},
       version: 1,
@@ -502,7 +975,114 @@ export function createMockData(): MockData {
       workspaceId: "m4",
       missionId: "mission-4",
       type: "claim",
-      content: "Hybrid SSM-Transformer block is optimal for edge devices",
+      content:
+        "Hybrid SSM-Transformer block is optimal for real-time edge devices.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n11-1",
+      workspaceId: "m4",
+      missionId: "mission-4",
+      type: "observation",
+      content:
+        "Transformers maintain superior recall on long-context in-context learning benchmarks compared to pure SSMs.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n11-2",
+      workspaceId: "m4",
+      missionId: "mission-4",
+      type: "claim",
+      content:
+        "Layer-interleaved SSM-Attention blocks combine linear scalability with high-precision associative memory retrieval.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+
+    // Scenario F: ADR Review - Event Sourcing
+    {
+      id: "n12-1",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "hypothesis",
+      content:
+        "Adopting Event Sourcing for core financial ledger ensures 100% auditable history and state reconstruction.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n12-2",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "claim",
+      content:
+        "Event Sourcing introduces high operational complexity, requiring custom event store management and schema migrations.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n12-3",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "claim",
+      content:
+        "CQRS (Command Query Responsibility Segregation) is required to support complex read queries, adding eventual consistency risks.",
+      strength: "moderate",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n12-4",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "observation",
+      content:
+        "Our current CRUD database cannot reconstruct past account balances at a specific millisecond, causing QA audit gaps.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n12-5",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "observation",
+      content:
+        "Industry benchmarks show CQRS read-model synchronization delays are typically under 50 milliseconds, satisfying SLA limits.",
+      strength: "strong",
+      metadata: {},
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: "n12-6",
+      workspaceId: "m6",
+      missionId: "mission-6",
+      type: "claim",
+      content:
+        "A hybrid approach using a PostgreSQL-backed transactional ledger with JSONB event tables provides auditability with low operational overhead.",
       strength: "moderate",
       metadata: {},
       version: 1,
@@ -512,6 +1092,7 @@ export function createMockData(): MockData {
   ];
 
   const baseEdges: EpistemicEdge[] = [
+    // Scenario A
     {
       id: "e1",
       workspaceId: "m1",
@@ -534,11 +1115,31 @@ export function createMockData(): MockData {
       id: "e3",
       workspaceId: "m1",
       sourceNodeId: "n4",
-      targetNodeId: "n2",
+      targetNodeId: "n3",
       type: "refines",
       metadata: {},
       createdAt: new Date(),
     },
+    {
+      id: "e3-1",
+      workspaceId: "m1",
+      sourceNodeId: "n4-1",
+      targetNodeId: "n4",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e3-2",
+      workspaceId: "m1",
+      sourceNodeId: "n4-2",
+      targetNodeId: "n1",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // Scenario B
     {
       id: "e4",
       workspaceId: "m2",
@@ -553,6 +1154,138 @@ export function createMockData(): MockData {
       workspaceId: "m2",
       sourceNodeId: "n7",
       targetNodeId: "n5",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e5-1",
+      workspaceId: "m2",
+      sourceNodeId: "n7-1",
+      targetNodeId: "n5",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e5-2",
+      workspaceId: "m2",
+      sourceNodeId: "n7-2",
+      targetNodeId: "n5",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // Scenario C
+    {
+      id: "e6",
+      workspaceId: "m3",
+      sourceNodeId: "n9-2",
+      targetNodeId: "n8",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e7",
+      workspaceId: "m3",
+      sourceNodeId: "n9",
+      targetNodeId: "n8",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e8",
+      workspaceId: "m3",
+      sourceNodeId: "n9-1",
+      targetNodeId: "n9",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e9",
+      workspaceId: "m3",
+      sourceNodeId: "n9-3",
+      targetNodeId: "n9-1",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // Scenario D
+    {
+      id: "e10",
+      workspaceId: "m4",
+      sourceNodeId: "n10",
+      targetNodeId: "n11",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e11",
+      workspaceId: "m4",
+      sourceNodeId: "n11-1",
+      targetNodeId: "n11",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e12",
+      workspaceId: "m4",
+      sourceNodeId: "n11-2",
+      targetNodeId: "n11-1",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+
+    // Scenario F
+    {
+      id: "e13",
+      workspaceId: "m6",
+      sourceNodeId: "n12-4",
+      targetNodeId: "n12-1",
+      type: "supports",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e14",
+      workspaceId: "m6",
+      sourceNodeId: "n12-2",
+      targetNodeId: "n12-1",
+      type: "contradicts",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e15",
+      workspaceId: "m6",
+      sourceNodeId: "n12-3",
+      targetNodeId: "n12-2",
+      type: "refines",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e16",
+      workspaceId: "m6",
+      sourceNodeId: "n12-5",
+      targetNodeId: "n12-3",
+      type: "addresses",
+      metadata: {},
+      createdAt: new Date(),
+    },
+    {
+      id: "e17",
+      workspaceId: "m6",
+      sourceNodeId: "n12-6",
+      targetNodeId: "n12-2",
       type: "addresses",
       metadata: {},
       createdAt: new Date(),
