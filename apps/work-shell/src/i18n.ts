@@ -18,7 +18,6 @@ i18n
             workplace: "Workplace",
             adr_review: "ADR Review",
             archive: "Archive",
-            telemetry: "Telemetry",
             active_workspaces: "Active",
             pinned_workspaces: "Pinned",
             archived_workspaces: "Archive",
@@ -27,7 +26,7 @@ i18n
             identity: "Identity (Pilot)",
           },
           workspace_menu: {
-            share: "Share",
+            share: "Share Workspace",
             pin: "Pin",
             unpin: "Unpin",
             rename: "Rename",
@@ -63,7 +62,6 @@ i18n
             workplace: "Рабочее место",
             adr_review: "Обзор ADR",
             archive: "Архив",
-            telemetry: "Телеметрия",
             active_workspaces: "Активные",
             pinned_workspaces: "Закреплённые",
             archived_workspaces: "Архив",
@@ -72,7 +70,7 @@ i18n
             identity: "Личность (Pilot)",
           },
           workspace_menu: {
-            share: "Поделиться чатом",
+            share: "Поделиться пространством",
             pin: "Закрепить",
             unpin: "Открепить",
             rename: "Переименовать",

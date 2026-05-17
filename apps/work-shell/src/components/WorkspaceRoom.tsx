@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../api-config";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GraphCanvas from "./GraphCanvas";
 import { ShieldCheck, Zap } from "lucide-react";
 import { useWorkspace } from "../context/WorkspaceContext";
@@ -21,6 +21,31 @@ const WorkspaceRoom: React.FC = () => {
   const [showWorkspaceCard, setShowWorkspaceCard] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
+  const [simulatedLatency, setSimulatedLatency] = useState(12);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSimulatedLatency(() => {
+        const rand = Math.random();
+        if (rand < 0.75) {
+          return Math.floor(10 + Math.random() * 15);
+        } else if (rand < 0.95) {
+          return Math.floor(35 + Math.random() * 80);
+        } else {
+          return Math.floor(160 + Math.random() * 100);
+        }
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const channelQuality =
+    simulatedLatency < 30
+      ? { color: "#73daca", label: "v1.0.0-PROD" }
+      : simulatedLatency < 150
+        ? { color: "#e0af68", label: "v1.0.0-PROD" }
+        : { color: "#f7768e", label: "v1.0.0-PROD" };
+
   const { currentUser } = useSecurity();
 
   const isAdmin = currentUser?.role === "approver";
@@ -509,9 +534,9 @@ const WorkspaceRoom: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          fontSize: "0.65rem",
+          fontSize: "11px",
           color: "var(--text-dim)",
-          fontFamily: "var(--font-mono)",
+          fontFamily: "'Inter', sans-serif",
           letterSpacing: "0.02em",
           position: "relative",
         }}
@@ -545,81 +570,129 @@ const WorkspaceRoom: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Right Side: Connection Status (Existing) */}
-        <div
-          className="status-trigger"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            cursor: "pointer",
-            padding: "8px 0",
-          }}
-        >
+        {/* Right Side: Connection Status / Telemetry (Admins only get hover specs) */}
+        {currentUser?.id === "admin-1" ? (
           <div
+            className="status-trigger"
             style={{
-              width: "4px",
-              height: "4px",
-              borderRadius: "50%",
-              backgroundColor: "var(--primary)",
-              boxShadow: "0 0 8px var(--primary)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              cursor: "pointer",
+              padding: "8px 0",
             }}
-          />
-          <span style={{ color: "var(--primary)", fontWeight: 600 }}>
-            EPIOS_SHELL_CONNECTED
-          </span>
-
-          {/* Hover Panel */}
-          <div className="status-popup premium-card">
+          >
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                backgroundColor: channelQuality.color,
+                boxShadow: `0 0 8px ${channelQuality.color}`,
+                transition: "all 0.3s ease",
+              }}
+            />
+            <span
+              style={{
+                color: channelQuality.color,
+                fontWeight: 600,
+                transition: "all 0.3s ease",
+              }}
             >
+              {channelQuality.label}
+            </span>
+
+            {/* Hover Panel */}
+            <div className="status-popup premium-card">
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  gap: "2rem",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "10px",
                 }}
               >
-                <span style={{ opacity: 0.5 }}>DATABASE</span>
-                <span style={{ color: "var(--success)" }}>
-                  POSTGRESQL_READY
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "2rem",
-                }}
-              >
-                <span style={{ opacity: 0.5 }}>KERNEL_API</span>
-                <span>v1.0.0-PROD</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "2rem",
-                }}
-              >
-                <span style={{ opacity: 0.5 }}>LATENCY</span>
-                <span style={{ color: "var(--primary)" }}>12ms</span>
-              </div>
-              <div
-                style={{
-                  borderTop: "1px solid var(--border)",
-                  paddingTop: "0.5rem",
-                  marginTop: "0.5rem",
-                  fontSize: "0.6rem",
-                  opacity: 0.4,
-                }}
-              >
-                SECURE_ENCLAVE_ACTIVE // TRACE_LEVEL: DEBUG
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "2rem",
+                  }}
+                >
+                  <span style={{ opacity: 0.5 }}>DATABASE</span>
+                  <span style={{ color: "var(--success)" }}>
+                    POSTGRESQL_READY
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "2rem",
+                  }}
+                >
+                  <span style={{ opacity: 0.5 }}>KERNEL_API</span>
+                  <span>v1.0.0-PROD</span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "2rem",
+                  }}
+                >
+                  <span style={{ opacity: 0.5 }}>LATENCY</span>
+                  <span
+                    style={{ color: channelQuality.color, fontWeight: "bold" }}
+                  >
+                    {simulatedLatency}ms
+                  </span>
+                </div>
+                <div
+                  style={{
+                    borderTop: "1px solid var(--border)",
+                    paddingTop: "0.5rem",
+                    marginTop: "0.5rem",
+                    fontSize: "9px",
+                    opacity: 0.4,
+                  }}
+                >
+                  SECURE_ENCLAVE_ACTIVE // TRACE_LEVEL: DEBUG
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "8px 0",
+            }}
+          >
+            <div
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                backgroundColor: channelQuality.color,
+                boxShadow: `0 0 8px ${channelQuality.color}`,
+                transition: "all 0.3s ease",
+              }}
+            />
+            <span
+              style={{
+                color: channelQuality.color,
+                fontWeight: 600,
+                transition: "all 0.3s ease",
+              }}
+            >
+              {channelQuality.label}
+            </span>
+          </div>
+        )}
 
         <style>{`
           .status-trigger {

@@ -152,6 +152,8 @@ export async function buildServer(deps: ServerDependencies = {}) {
       "Authorization",
       "x-user-id",
       "X-User-Id",
+      "x-workplace-id",
+      "X-Workplace-Id",
       "Accept",
       "Origin",
     ],

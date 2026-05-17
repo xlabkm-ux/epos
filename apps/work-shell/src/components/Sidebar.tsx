@@ -10,6 +10,7 @@ import {
   Copy,
 } from "lucide-react";
 import { useWorkspace } from "../context/WorkspaceContext";
+import { useSecurity } from "../context/SecurityContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Workspace } from "@epios/api";
@@ -39,6 +40,44 @@ const Sidebar: React.FC = () => {
     setActiveView,
     refreshWorkspaces,
   } = useWorkspace();
+
+  const { activeWorkplace } = useSecurity();
+
+  const [orgUnits, setOrgUnits] = useState<Array<{ id: string; name: string }>>(
+    [],
+  );
+  const [orgPositions, setOrgPositions] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+
+  useEffect(() => {
+    const fetchOrgData = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/identity/org-structure`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setOrgUnits(data.units || []);
+          setOrgPositions(data.positions || []);
+        }
+      } catch (err) {
+        console.error("Failed to load org structure in Sidebar:", err);
+      }
+    };
+    fetchOrgData();
+  }, []);
+
+  const activeUnitName = activeWorkplace
+    ? orgUnits.find((u) => u.id === activeWorkplace.toJSON().details.unitId)
+        ?.name || activeWorkplace.toJSON().details.unitId
+    : null;
+
+  const activePositionName = activeWorkplace
+    ? orgPositions.find(
+        (p) => p.id === activeWorkplace.toJSON().details.positionId,
+      )?.name || activeWorkplace.toJSON().details.positionId
+    : null;
 
   // Theme Logic
   const [theme] = useState(() => {
@@ -268,7 +307,15 @@ const Sidebar: React.FC = () => {
         >
           <SidebarItem
             icon={<Layout size={18} />}
-            label={t("sidebar.workplace")}
+            label={
+              activeUnitName ||
+              (activeWorkplace ? activeWorkplace.id : t("sidebar.workplace"))
+            }
+            title={
+              activeWorkplace
+                ? `Подразделение: ${activeUnitName || "—"}\nДолжность: ${activePositionName || "—"}\nРоль: ${activeWorkplace.role}\nID: ${activeWorkplace.id.toUpperCase()}`
+                : ""
+            }
             active={activeView === "ROOM"}
             isCollapsed={isCollapsed}
             onClick={() => setActiveView("ROOM")}
@@ -286,14 +333,6 @@ const Sidebar: React.FC = () => {
             active={activeView === "ARCHIVE"}
             isCollapsed={isCollapsed}
             onClick={() => setActiveView("ARCHIVE")}
-          />
-          <SidebarItem
-            icon={<Activity size={18} />}
-            label={t("sidebar.telemetry")}
-            isCollapsed={isCollapsed}
-            onClick={() =>
-              alert("Real-time workspace metrics synchronization...")
-            }
           />
 
           {/* ── Workspaces List (Pinned first, no headers) ── */}
@@ -360,6 +399,7 @@ const Sidebar: React.FC = () => {
           <div style={{ marginBottom: "0.5rem" }}>
             <RoleSwitcher
               isCollapsed={isCollapsed}
+              sessionOnly={true}
               onOpenSettings={() => setShowSettings(true)}
               onOpenHelp={() => setShowHelp(true)}
             />
@@ -554,9 +594,10 @@ const HelpContent: React.FC<{ language: string }> = ({ language }) => {
                 </li>
                 <li>
                   <strong>Разделы навигации:</strong> Переходы между экранами{" "}
-                  <em>«Рабочее место»</em> (холст графа), <em>«Обзор ADR»</em>{" "}
-                  (симуляции и ревью), <em>«Архив»</em> (восстановление
-                  пространств) и <em>«Телеметрия»</em>.
+                  <em>«Рабочее место / Активное РМ»</em> (динамически отображает
+                  выбранное в настройках название), <em>«Обзор ADR»</em>{" "}
+                  (симуляции и ревью) и <em>«Архив»</em> (восстановление
+                  пространств).
                 </li>
                 <li>
                   <strong>Индикатор активности воркспейса:</strong> Светящаяся
@@ -564,15 +605,11 @@ const HelpContent: React.FC<{ language: string }> = ({ language }) => {
                   воркспейс.
                 </li>
                 <li>
-                  <strong>Селектор личностей (Role Switcher):</strong> Включает
-                  роли <em>Viewer</em>, <em>Contributor</em>, <em>Approver</em>{" "}
-                  и <em>Admin</em>.
-                </li>
-                <li>
-                  <strong>Блок сессии:</strong> Показывает имя пользователя.{" "}
+                  <strong>Блок сессии:</strong> Показывает имя пользователя и
+                  его активную роль (<code>Имя (Роль)</code>).{" "}
                   <strong>
-                    Клик по нему открывает меню с Настройками, Справкой и
-                    Выходом.
+                    Клик по нему открывает меню с Настройками (где также
+                    находится селектор личностей), Справкой и Выходом.
                   </strong>
                 </li>
               </ul>
@@ -812,9 +849,10 @@ const HelpContent: React.FC<{ language: string }> = ({ language }) => {
                 </li>
                 <li>
                   <strong>Navigation items:</strong> Easily switch between{" "}
-                  <em>Workplace</em> (graph canvas), <em>ADR Review</em>{" "}
-                  (simulations and voting), <em>Archive</em> (neural storage),
-                  and <em>Telemetry</em>.
+                  <em>Workplace / Active WP</em> (dynamically displays the
+                  active workplace selected in settings), <em>ADR Review</em>{" "}
+                  (simulations and voting), and <em>Archive</em> (neural
+                  storage).
                 </li>
                 <li>
                   <strong>Active Workspace indicator:</strong> A glowing purple
@@ -822,14 +860,11 @@ const HelpContent: React.FC<{ language: string }> = ({ language }) => {
                   workspace.
                 </li>
                 <li>
-                  <strong>Role Switcher (Identity Context):</strong> Simulates
-                  roles: <em>Viewer</em>, <em>Contributor</em>,{" "}
-                  <em>Approver</em>, and <em>Admin</em>.
-                </li>
-                <li>
-                  <strong>Session Pill:</strong> Shows current active username.{" "}
+                  <strong>Session Pill:</strong> Shows current active username
+                  and role (<code>username (Role)</code>).{" "}
                   <strong>
-                    Click to open the user menu for Settings, Help, and Exit.
+                    Click to open the user menu for Settings (where you can also
+                    find the Role Switcher), Help, and Exit.
                   </strong>
                 </li>
               </ul>

@@ -94,13 +94,23 @@ const GraphCanvasInner: React.FC = () => {
       const saved = graphStates[selectedWorkspaceId];
       if (saved && Array.isArray(saved.nodes) && Array.isArray(saved.edges)) {
         const shortWsId = selectedWorkspaceId.replace(/^[0-]+/, "") || "0";
-        const patchedNodes = saved.nodes.map((node, index) => ({
-          ...node,
-          data: {
-            ...node.data,
-            hierarchicalId: `${shortWsId}.${index + 1}`,
-          },
-        }));
+        const patchedNodes = saved.nodes.map((node, index) => {
+          const rawType = (node.data.type || "hypothesis").toUpperCase();
+          const normalizedType =
+            rawType === "OBSERVATION"
+              ? "EVIDENCE"
+              : rawType === "RISK"
+                ? "CLAIM"
+                : rawType;
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              type: normalizedType,
+              hierarchicalId: `${shortWsId}.${index + 1}`,
+            },
+          };
+        });
         setNodes(patchedNodes);
         setEdges(saved.edges);
       } else {
@@ -122,6 +132,13 @@ const GraphCanvasInner: React.FC = () => {
         apiNodes.forEach((apiNode) => {
           if (!currentNodes.some((n) => n.id === apiNode.id)) {
             hasChanges = true;
+            const rawType = (apiNode.type || "hypothesis").toUpperCase();
+            const normalizedType =
+              rawType === "OBSERVATION"
+                ? "EVIDENCE"
+                : rawType === "RISK"
+                  ? "CLAIM"
+                  : rawType;
             newNodes.push({
               id: apiNode.id,
               type: "epistemic",
@@ -131,7 +148,7 @@ const GraphCanvasInner: React.FC = () => {
               },
               data: {
                 label: apiNode.content,
-                type: apiNode.type,
+                type: normalizedType,
                 hierarchicalId: `${shortWsId}.${newNodes.length + 1}`,
               },
             });
@@ -149,12 +166,13 @@ const GraphCanvasInner: React.FC = () => {
         apiEdges.forEach((apiEdge) => {
           if (!currentEdges.some((e) => e.id === apiEdge.id)) {
             hasChanges = true;
+            const normalizedEdgeType = (apiEdge.type || "").toUpperCase();
             newEdges.push({
               id: apiEdge.id,
               source: apiEdge.sourceNodeId,
               target: apiEdge.targetNodeId,
               animated: true,
-              label: apiEdge.type,
+              label: normalizedEdgeType,
               labelStyle: {
                 fill: "var(--text-dim)",
                 fontSize: "10px",
@@ -163,7 +181,7 @@ const GraphCanvasInner: React.FC = () => {
               },
               style: {
                 stroke:
-                  apiEdge.type === "SUPPORTS"
+                  normalizedEdgeType === "SUPPORTS"
                     ? "var(--success)"
                     : "var(--primary)",
                 strokeWidth: 2,
@@ -172,7 +190,7 @@ const GraphCanvasInner: React.FC = () => {
               markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color:
-                  apiEdge.type === "SUPPORTS"
+                  normalizedEdgeType === "SUPPORTS"
                     ? "var(--success)"
                     : "var(--primary)",
               },
@@ -224,11 +242,20 @@ const GraphCanvasInner: React.FC = () => {
 
   const onNodeDoubleClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
-      setSelectedNodeId((prev: string | null) =>
-        prev === node.id ? null : node.id,
+      setSelectedNodeId(node.id);
+
+      const zoom = 1.0;
+      const panelOffset = 384 / 2 / zoom;
+      const cardCenterX = 110;
+      const cardCenterY = 75;
+
+      setCenter(
+        node.position.x + cardCenterX + panelOffset,
+        node.position.y + cardCenterY,
+        { zoom, duration: 800 },
       );
     },
-    [setSelectedNodeId],
+    [setSelectedNodeId, setCenter],
   );
 
   // Auto-center camera when selection changes
@@ -363,8 +390,10 @@ const GraphCanvasInner: React.FC = () => {
             : "edge-normal",
         style: {
           ...edge.style,
-          opacity: isHighlighted ? 1 : isDimmed ? 0.15 : 0.6,
-          transition: "opacity 0.3s ease",
+          strokeWidth: isHighlighted ? 3 : 1.5,
+          opacity: isHighlighted ? 1 : isDimmed ? 0.35 : 0.6,
+          strokeDasharray: isHighlighted ? "6, 6" : undefined,
+          transition: "all 0.3s ease",
         },
         labelStyle: {
           ...edge.labelStyle,
@@ -583,6 +612,17 @@ const GraphCanvasInner: React.FC = () => {
           />
         </div>
       </ReactFlow>
+      <style>{`
+        @keyframes flowDash {
+          to {
+            stroke-dashoffset: -20;
+          }
+        }
+        .edge-highlighted path {
+          animation: flowDash 1s linear infinite !important;
+          filter: drop-shadow(0 0 3px var(--primary));
+        }
+      `}</style>
     </div>
   );
 };

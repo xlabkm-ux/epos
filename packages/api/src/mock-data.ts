@@ -92,7 +92,11 @@ function createRussianDemoData(): {
       id: `ws7-n${i}`,
       workspaceId: "m7",
       missionId: "mission-7",
-      type: (i % 2 === 0 ? "claim" : "hypothesis") as NodeType,
+      type: (i % 3 === 0
+        ? "hypothesis"
+        : i % 2 === 0
+          ? "observation"
+          : "claim") as NodeType,
       content: [
         "Микросервисы повышают масштабируемость системы",
         "Сложность отладки в распределенных системах увеличивается",
@@ -116,7 +120,11 @@ function createRussianDemoData(): {
       id: `ws8-n${i}`,
       workspaceId: "m8",
       missionId: "mission-8",
-      type: (i % 4 === 0 ? "risk" : "claim") as NodeType,
+      type: (i % 3 === 0
+        ? "hypothesis"
+        : i % 2 === 0
+          ? "observation"
+          : "claim") as NodeType,
       content:
         [
           "Облачные провайдеры снижают капитальные затраты (CAPEX)",
@@ -141,7 +149,11 @@ function createRussianDemoData(): {
       id: `ws9-n${i}`,
       workspaceId: "m9",
       missionId: "mission-9",
-      type: (i % 5 === 0 ? "observation" : "claim") as NodeType,
+      type: (i % 3 === 0
+        ? "hypothesis"
+        : i % 2 === 0
+          ? "observation"
+          : "claim") as NodeType,
       content:
         [
           "Бонусные баллы должны сгорать через 12 месяцев",

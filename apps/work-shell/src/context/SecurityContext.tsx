@@ -77,8 +77,10 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
     if (!id) return;
     try {
       const headers: Record<string, string> = { "x-user-id": id };
-      if (activeWorkplaceId) {
-        headers["x-workplace-id"] = activeWorkplaceId;
+      const savedWpId =
+        localStorage.getItem("activeWorkplaceId") || activeWorkplaceId;
+      if (savedWpId) {
+        headers["x-workplace-id"] = savedWpId;
       }
       const response = await fetch(
         `${API_BASE_URL}/api/v1/identity/assignments`,
@@ -90,19 +92,23 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
       if (data && Array.isArray(data.assignments)) {
         setAvailableAssignments(data.assignments);
 
-        // If no active WP or active WP not in list, pick first
-        if (data.assignments.length > 0) {
-          if (
-            !activeWorkplaceId ||
-            !data.assignments.find(
-              (a: Assignment) => a.id === activeWorkplaceId,
-            )
-          ) {
-            switchWorkplace(data.assignments[0].id);
+        // Validate if saved activeWorkplaceId is actually available for this user
+        if (savedWpId) {
+          const isValid = data.assignments.some(
+            (a: Assignment) => a.id === savedWpId,
+          );
+          if (isValid) {
+            setActiveWorkplaceId(savedWpId);
+            localStorage.setItem("activeWorkplaceId", savedWpId);
+          } else {
+            setActiveWorkplaceId(null);
+            localStorage.removeItem("activeWorkplaceId");
           }
         }
       } else {
         setAvailableAssignments([]);
+        setActiveWorkplaceId(null);
+        localStorage.removeItem("activeWorkplaceId");
       }
     } catch (error) {
       console.error("Failed to fetch assignments", error);

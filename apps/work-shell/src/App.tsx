@@ -8,14 +8,30 @@ import SecurityDashboard from "./components/SecurityDashboard";
 import { useWorkspace } from "./context/WorkspaceContext";
 import { useSecurity } from "./context/SecurityContext";
 import AuthScreen from "./components/AuthScreen";
+import { WorkplaceSelectScreen } from "./components/WorkplaceSelectScreen";
 
 function App() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const { activeView, restoreWorkspace } = useWorkspace();
-  const { currentUser, login } = useSecurity();
+  const { currentUser, login, activeWorkplace } = useSecurity();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   if (!currentUser) {
     return <AuthScreen onLogin={login} />;
+  }
+
+  if (!activeWorkplace) {
+    return <WorkplaceSelectScreen />;
   }
 
   const renderContent = () => {
@@ -32,17 +48,6 @@ function App() {
         return <WorkspaceRoom />;
     }
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setIsPaletteOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   return (
     <div

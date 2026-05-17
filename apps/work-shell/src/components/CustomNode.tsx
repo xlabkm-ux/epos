@@ -12,26 +12,44 @@ const CustomNode = ({ data, selected }: NodeProps) => {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "HYPOTHESIS":
-        return <Lightbulb size={14} color="var(--primary)" />;
+        return (
+          <Lightbulb
+            size={14}
+            color="#7aa2f7"
+            style={{ filter: "drop-shadow(0 0 4px rgba(122, 162, 247, 0.6))" }}
+          />
+        );
       case "EVIDENCE":
-        return <Database size={14} color="var(--success)" />;
+        return (
+          <Database
+            size={14}
+            color="#73daca"
+            style={{ filter: "drop-shadow(0 0 4px rgba(115, 218, 202, 0.6))" }}
+          />
+        );
       case "CLAIM":
-        return <FileText size={14} color="var(--secondary)" />;
+        return (
+          <FileText
+            size={14}
+            color="#bb9af7"
+            style={{ filter: "drop-shadow(0 0 4px rgba(187, 154, 247, 0.6))" }}
+          />
+        );
       default:
-        return <AlertCircle size={14} color="var(--text-dim)" />;
+        return <AlertCircle size={14} color="#a9b1d6" />;
     }
   };
 
   const getThemeColor = (type: string) => {
     switch (type) {
       case "HYPOTHESIS":
-        return "var(--primary)";
+        return "#7aa2f7"; // Radiant Tokyo Night Blue
       case "EVIDENCE":
-        return "var(--success)";
+        return "#73daca"; // Radiant Tokyo Night Green/Teal
       case "CLAIM":
-        return "var(--secondary)";
+        return "#bb9af7"; // Radiant Tokyo Night Purple
       default:
-        return "var(--border)";
+        return "#a9b1d6";
     }
   };
 
@@ -40,34 +58,36 @@ const CustomNode = ({ data, selected }: NodeProps) => {
   return (
     <div
       style={{
-        borderRadius: "var(--radius-lg)",
-        width: "240px",
-        background: "var(--bg-card)",
-        transition: "all 0.2s ease",
-        border: `1px solid ${selected ? "var(--primary)" : "var(--border)"}`,
+        borderRadius: "16px",
+        width: "250px",
+        background:
+          "linear-gradient(135deg, rgba(30, 34, 51, 0.8) 0%, rgba(15, 17, 26, 0.95) 100%)",
+        backdropFilter: "blur(20px)",
+        transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+        borderLeft: `4px solid ${themeColor}`,
+        borderTop: `1px solid ${selected ? themeColor : "rgba(255, 255, 255, 0.08)"}`,
+        borderRight: `1px solid ${selected ? themeColor : "rgba(255, 255, 255, 0.08)"}`,
+        borderBottom: `1px solid ${selected ? themeColor : "rgba(255, 255, 255, 0.08)"}`,
         boxShadow: selected
-          ? "0 0 0 1px var(--primary), var(--panel-shadow)"
-          : "var(--panel-shadow)",
+          ? `0 0 25px ${themeColor}50, 0 12px 30px rgba(0, 0, 0, 0.6)`
+          : "0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05)",
         cursor: "pointer",
         overflow: "hidden",
+        position: "relative",
       }}
+      className={`custom-node-${data.type.toLowerCase()}`}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0",
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
         <Handle
           type="target"
           position={Position.Top}
           style={{
             background: themeColor,
-            border: "2px solid var(--bg-card)",
+            border: "2px solid #0f111a",
             width: "10px",
             height: "10px",
             top: "-5px",
+            boxShadow: `0 0 8px ${themeColor}`,
           }}
         />
 
@@ -77,9 +97,9 @@ const CustomNode = ({ data, selected }: NodeProps) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "8px 12px",
-            background: "rgba(255, 255, 255, 0.03)",
-            borderBottom: "1px solid var(--border)",
+            padding: "10px 14px",
+            background: `linear-gradient(90deg, ${themeColor}12, transparent)`,
+            borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
           }}
         >
           <div
@@ -89,18 +109,20 @@ const CustomNode = ({ data, selected }: NodeProps) => {
               gap: "8px",
               fontSize: "11px",
               color: themeColor,
-              fontWeight: 600,
-              letterSpacing: "0.02em",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
             }}
           >
             {getTypeIcon(data.type)}
-            <span style={{ opacity: 0.8 }}>{data.type}</span>
+            <span>{data.type}</span>
           </div>
           <div
             style={{
               fontSize: "10px",
-              color: "var(--text-muted)",
+              color: "rgba(255, 255, 255, 0.4)",
               fontFamily: "var(--font-mono)",
+              fontWeight: 600,
             }}
           >
             {data.hierarchicalId || "0.0"}
@@ -110,13 +132,13 @@ const CustomNode = ({ data, selected }: NodeProps) => {
         {/* Node Body */}
         <div
           style={{
-            padding: "12px",
+            padding: "14px",
             fontSize: "13px",
-            fontWeight: 400,
-            color: "var(--text-main)",
+            fontWeight: 500,
+            color: "#c0caf5",
             lineHeight: 1.5,
             wordBreak: "break-word",
-            minHeight: "48px",
+            minHeight: "44px",
           }}
         >
           {data.label}
@@ -125,11 +147,15 @@ const CustomNode = ({ data, selected }: NodeProps) => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
+                gap: "6px",
                 fontSize: "10px",
-                color: "var(--warning)",
-                marginTop: "4px",
+                color: "#ff966c",
+                marginTop: "6px",
                 fontStyle: "italic",
+                background: "rgba(255, 150, 108, 0.08)",
+                padding: "4px 8px",
+                borderRadius: "6px",
+                border: "1px solid rgba(255, 150, 108, 0.15)",
               }}
             >
               <ShieldAlert size={12} />
@@ -138,20 +164,29 @@ const CustomNode = ({ data, selected }: NodeProps) => {
           )}
         </div>
 
-        {/* Node Footer / Metadata */}
+        {/* Node Footer / Metadata (Optional badge indicator) */}
         {data.metadata && (
           <div
             style={{
-              padding: "8px 12px",
-              borderTop: "1px solid var(--border)",
+              padding: "6px 14px",
+              borderTop: "1px solid rgba(255, 255, 255, 0.04)",
               display: "flex",
               alignItems: "center",
+              justifyContent: "flex-end",
               gap: "8px",
+              background: "rgba(0, 0, 0, 0.1)",
             }}
           >
-            <div style={{ display: "flex", gap: "4px" }}>
-              {/* Optional status dots or mini-tags could go here */}
-            </div>
+            <span
+              style={{
+                fontSize: "9px",
+                color: "rgba(255, 255, 255, 0.3)",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
+              Verified Node
+            </span>
           </div>
         )}
 
@@ -160,10 +195,11 @@ const CustomNode = ({ data, selected }: NodeProps) => {
           position={Position.Bottom}
           style={{
             background: themeColor,
-            border: "2px solid var(--bg-card)",
+            border: "2px solid #0f111a",
             width: "10px",
             height: "10px",
             bottom: "-5px",
+            boxShadow: `0 0 8px ${themeColor}`,
           }}
         />
       </div>

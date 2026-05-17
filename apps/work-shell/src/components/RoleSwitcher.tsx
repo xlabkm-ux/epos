@@ -46,13 +46,15 @@ export const RoleSwitcher: React.FC<{
   isCollapsed?: boolean;
   onOpenSettings?: () => void;
   onOpenHelp?: () => void;
-}> = ({ isCollapsed, onOpenSettings, onOpenHelp }) => {
+  sessionOnly?: boolean;
+}> = ({ isCollapsed, onOpenSettings, onOpenHelp, sessionOnly }) => {
   const { currentUser, setCurrentUserId, logout } = useSecurity();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const activeRole = roles.find((r) => currentUser?.id === r.id) || roles[0];
+
   if (isCollapsed) {
-    const activeRole = roles.find((r) => currentUser?.id === r.id) || roles[0];
     const Icon = activeRole.icon;
     return (
       <div
@@ -86,87 +88,105 @@ export const RoleSwitcher: React.FC<{
   return (
     <div
       style={{
-        padding: "0.75rem",
+        padding: sessionOnly ? "0" : "0.75rem",
         borderRadius: "12px",
-        backgroundColor: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.05)",
+        backgroundColor: sessionOnly ? "transparent" : "rgba(255,255,255,0.02)",
+        border: sessionOnly ? "none" : "1px solid rgba(255,255,255,0.05)",
       }}
     >
-      <div
-        style={{
-          fontSize: "0.65rem",
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
-          color: "var(--text-dim)",
-          marginBottom: "0.75rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          paddingLeft: "0.25rem",
-        }}
-      >
-        <Shield size={10} />
-        Identity Context
-      </div>
+      {!sessionOnly && (
+        <>
+          <div
+            style={{
+              fontSize: "0.65rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "var(--text-dim)",
+              marginBottom: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              paddingLeft: "0.25rem",
+            }}
+          >
+            <Shield size={10} />
+            Identity Context
+          </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-        {roles.map((r) => {
-          const isActive = currentUser?.id === r.id;
-          const Icon = r.icon;
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.4rem",
+              marginBottom: "0.75rem",
+            }}
+          >
+            {roles.map((r) => {
+              const isActive = currentUser?.id === r.id;
+              const Icon = r.icon;
 
-          return (
-            <button
-              key={r.id}
-              onClick={() => setCurrentUserId(r.id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "8px",
-                border: "1px solid",
-                borderColor: isActive ? `${r.color}50` : "transparent",
-                backgroundColor: isActive ? `${r.color}15` : "transparent",
-                color: isActive ? r.color : "var(--text-dim)",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                textAlign: "left",
-                width: "100%",
-              }}
-            >
-              <Icon size={14} />
-              <div style={{ flex: 1, overflow: "hidden" }}>
-                <div
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => setCurrentUserId(r.id)}
                   style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    padding: "0.5rem 0.75rem",
+                    borderRadius: "8px",
+                    border: "1px solid",
+                    borderColor: isActive ? `${r.color}50` : "transparent",
+                    backgroundColor: isActive ? `${r.color}15` : "transparent",
+                    color: isActive ? r.color : "var(--text-dim)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    textAlign: "left",
+                    width: "100%",
                   }}
                 >
-                  {r.label}
-                </div>
-                <div style={{ fontSize: "0.6rem", opacity: 0.6 }}>{r.role}</div>
-              </div>
-              {isActive && (
-                <div
-                  style={{
-                    width: "4px",
-                    height: "4px",
-                    borderRadius: "50%",
-                    backgroundColor: r.color,
-                    boxShadow: `0 0 8px ${r.color}`,
-                  }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  <Icon size={14} />
+                  <div style={{ flex: 1, overflow: "hidden" }}>
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {r.label}
+                    </div>
+                    <div style={{ fontSize: "0.6rem", opacity: 0.6 }}>
+                      {r.role}
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div
+                      style={{
+                        width: "4px",
+                        height: "4px",
+                        borderRadius: "50%",
+                        backgroundColor: r.color,
+                        boxShadow: `0 0 8px ${r.color}`,
+                      }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {currentUser && (
-        <div style={{ position: "relative", marginTop: "0.75rem" }}>
+        <div
+          style={{
+            position: "relative",
+            marginTop: sessionOnly ? "0" : "0.75rem",
+          }}
+        >
           {/* Backdrop for closing dropdown */}
           {menuOpen && (
             <div
@@ -345,7 +365,10 @@ export const RoleSwitcher: React.FC<{
             }}
           >
             <span>
-              Session: <strong>{currentUser.username}</strong>
+              Session:{" "}
+              <strong>
+                {currentUser.username} ({activeRole.label})
+              </strong>
             </span>
             <span
               style={{

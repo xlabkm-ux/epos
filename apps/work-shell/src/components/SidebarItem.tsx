@@ -19,6 +19,7 @@ export interface SidebarItemProps {
   isWorkspace?: boolean;
   isPinned?: boolean;
   status?: string;
+  title?: string;
   onClick?: () => void;
   onAction?: (action: string) => void;
 }
@@ -32,6 +33,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   isWorkspace,
   isPinned,
   status,
+  title,
   onClick,
   onAction,
 }) => {
@@ -61,7 +63,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         }}
         whileTap={{ scale: 0.98 }}
         onClick={onClick}
-        title={isCollapsed ? label : ""}
+        title={title || (isCollapsed ? label : "")}
         style={{
           display: "flex",
           alignItems: "center",
