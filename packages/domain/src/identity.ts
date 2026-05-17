@@ -128,7 +128,10 @@ export class WorkPlace {
       workplaceId: this.id,
       role: this.role,
       workspaceId: this.workspaceId,
-      details: this.assignment.toJSON(),
+      details:
+        typeof this.assignment.toJSON === "function"
+          ? this.assignment.toJSON()
+          : this.assignment,
     };
   }
 }

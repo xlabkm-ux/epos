@@ -90,11 +90,28 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({
       );
       const data = await response.json();
       if (data && Array.isArray(data.assignments)) {
-        setAvailableAssignments(data.assignments);
+        const assignmentsInstances = data.assignments.map((a: unknown) => {
+          const item = a as Record<string, unknown>;
+          return new Assignment({
+            id: String(item.id || ""),
+            userId: String(item.userId || ""),
+            unitId: item.unitId ? String(item.unitId) : undefined,
+            positionId: item.positionId ? String(item.positionId) : undefined,
+            role: (item.role as Assignment["role"]) || "observer",
+            isActive: Boolean(item.isActive),
+            workspaceId: item.workspaceId
+              ? String(item.workspaceId)
+              : undefined,
+            createdAt: item.createdAt
+              ? new Date(String(item.createdAt))
+              : new Date(),
+          });
+        });
+        setAvailableAssignments(assignmentsInstances);
 
         // Validate if saved activeWorkplaceId is actually available for this user
         if (savedWpId) {
-          const isValid = data.assignments.some(
+          const isValid = assignmentsInstances.some(
             (a: Assignment) => a.id === savedWpId,
           );
           if (isValid) {

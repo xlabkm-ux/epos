@@ -1,7 +1,7 @@
 # ✅ Sprint 8 — QA Gate Report
 
-> **Дата:** 2026-05-17T06:35:55.746Z  
-> **Коммит:** `60a3b3c`  
+> **Дата:** 2026-05-17T06:45:17.651Z  
+> **Коммит:** `4521f97`  
 > **Ветка:** `feat/adr-0099-hardening-reconciliation`  
 > **Общий статус:** **PASS**
 
@@ -15,7 +15,7 @@
 | Провалено гейтов | 0 |
 | Предупреждения | 1 |
 | Пропущено | 0 |
-| Общее время | 61.8s |
+| Общее время | 46.1s |
 
 ---
 
@@ -23,13 +23,13 @@
 
 | Гейт | Название | Статус | Время |
 | :--- | :--- | :--- | :--- |
-| ✅ G1 | Static Analysis — Lint | **PASS** | 5846ms |
-| ✅ G1b | Static Analysis — TypeCheck | **PASS** | 30998ms |
-| ✅ G2 | Architecture Boundaries — Dependency Cruiser | **PASS** | 2928ms |
-| ✅ G3 | Domain Invariants — Unit Tests | **PASS** | 4123ms |
-| ✅ G4 | Full Test Suite (all packages) | **PASS** | 12589ms |
-| ⚠️ G5 | Security Audit & Secret Scan | **WARN** | 4341ms |
-| ✅ G6 | Documentation Governance Check | **PASS** | 974ms |
+| ✅ G1 | Static Analysis — Lint | **PASS** | 3373ms |
+| ✅ G1b | Static Analysis — TypeCheck | **PASS** | 17773ms |
+| ✅ G2 | Architecture Boundaries — Dependency Cruiser | **PASS** | 3008ms |
+| ✅ G3 | Domain Invariants — Unit Tests | **PASS** | 3858ms |
+| ✅ G4 | Full Test Suite (all packages) | **PASS** | 13047ms |
+| ⚠️ G5 | Security Audit & Secret Scan | **WARN** | 4033ms |
+| ✅ G6 | Documentation Governance Check | **PASS** | 999ms |
 | ✅ G7 | STATUS.md — Sprint Checklist Completeness | **PASS** | 1ms |
 | ✅ G8 | PROJECT_MAP.md — Freshness Check | **PASS** | 0ms |
 
