@@ -10,10 +10,9 @@ import {
   Copy,
 } from "lucide-react";
 import { useWorkspace } from "../context/WorkspaceContext";
-import { useSecurity } from "../context/SecurityContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Workspace } from "@epios/domain";
+import { Workspace } from "@epios/api";
 import { API_BASE_URL } from "../api-config";
 
 // Refactored Components

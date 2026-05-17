@@ -8,7 +8,7 @@ import {
   Terminal,
 } from "lucide-react";
 import { API_BASE_URL } from "../api-config";
-import { User } from "@epios/domain";
+import { User } from "@epios/api";
 
 interface AuthScreenProps {
   onLogin: (userData: User) => void;

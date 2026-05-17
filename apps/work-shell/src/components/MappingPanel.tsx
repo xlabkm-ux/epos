@@ -12,7 +12,7 @@ import {
   Radio,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MappingRun } from "@epios/domain";
+import { MappingRun } from "@epios/api";
 
 interface SseProgress {
   id?: string;
