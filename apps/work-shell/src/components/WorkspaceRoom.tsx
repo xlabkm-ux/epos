@@ -8,7 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { MissionPanel } from "./MissionPanel";
 import { RatingPanel } from "./RatingPanel";
 import { ShieldAlert } from "lucide-react";
-import { Workspace } from "@epios/api";
+import { Workspace } from "@epios/domain";
 
 const WorkspaceRoom: React.FC = () => {
   const {

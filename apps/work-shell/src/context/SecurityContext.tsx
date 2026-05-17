@@ -6,7 +6,7 @@ import React, {
   useMemo,
   ReactNode,
 } from "react";
-import { User, Assignment, WorkPlace } from "@epios/api";
+import { User, Assignment, WorkPlace } from "@epios/domain";
 import { API_BASE_URL } from "../api-config";
 
 interface SecurityContextType {

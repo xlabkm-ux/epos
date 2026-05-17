@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Node, Edge } from "reactflow";
 
-import { Workspace } from "@epios/api";
+import { Workspace } from "@epios/domain";
 import { API_BASE_URL } from "../api-config";
 import { useApi } from "../hooks/useApi";
 import { useSecurity } from "./SecurityContext";

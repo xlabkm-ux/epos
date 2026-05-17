@@ -50,6 +50,11 @@ i18n
             warning:
               "Public links can be accessed by all users. Share information carefully.",
           },
+          user_menu: {
+            settings: "Settings",
+            help: "Help",
+            exit: "Exit",
+          },
         },
       },
       ru: {
@@ -89,6 +94,11 @@ i18n
             copy: "Скопировать ссылку",
             warning:
               "По общедоступным ссылкам могут переходить все пользователи. Делитесь информацией с осторожностью.",
+          },
+          user_menu: {
+            settings: "Настройки",
+            help: "Справка",
+            exit: "Выход",
           },
         },
       },

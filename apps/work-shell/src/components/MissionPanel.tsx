@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { GovernancePanel } from "./GovernancePanel";
 import { SourcePanel } from "./SourcePanel";
 import { MappingPanel } from "./MappingPanel";
-import { Workspace } from "@epios/api";
+import { Workspace } from "@epios/domain";
 
 export const MissionPanel: React.FC<{
   workspace: Workspace;

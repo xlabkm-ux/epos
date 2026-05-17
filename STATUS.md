@@ -74,9 +74,9 @@
 - [x] **Docs Alignment**: Обновить `PROJECT_MAP.md`, `AGENT.md` и все регламенты, ссылающиеся на `work-shell`.
 - [x] **QA Gate G2-G8**: Прохождение всех гейтов качества под новым именем приложения.
 
-### Спринт 8: Identity & Persona Transition (Запланировано)
-- [ ] Интеграция RoleSwitcher в Sidebar для управления контекстом Identity.
-- [ ] Реализация смены Persona (ActorRef) в реальном времени.
+### Спринт 8: Identity & Persona Transition (In Progress)
+- [x] Интеграция RoleSwitcher в Sidebar для управления контекстом Identity.
+- [x] Реализация смены Persona (ActorRef) в реальном времени.
 
 ---
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from "react";
-import { McpRequestSchema } from "@epios/api";
+import { McpRequestSchema } from "@epios/infrastructure-mcp";
 
 interface SecureMcpIframeProps {
   appUrl: string;
