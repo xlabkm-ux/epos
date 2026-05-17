@@ -183,7 +183,9 @@ const GraphCanvasInner: React.FC = () => {
                 stroke:
                   normalizedEdgeType === "SUPPORTS"
                     ? "var(--success)"
-                    : "var(--primary)",
+                    : normalizedEdgeType === "CONTRADICTS"
+                      ? "var(--accent)"
+                      : "var(--primary)",
                 strokeWidth: 2,
                 opacity: 0.6,
               },
@@ -192,7 +194,9 @@ const GraphCanvasInner: React.FC = () => {
                 color:
                   normalizedEdgeType === "SUPPORTS"
                     ? "var(--success)"
-                    : "var(--primary)",
+                    : normalizedEdgeType === "CONTRADICTS"
+                      ? "var(--accent)"
+                      : "var(--primary)",
               },
             });
           }
