@@ -175,7 +175,14 @@ async function seed() {
       role: "observer",
       isActive: 1,
     },
-    // compatibility with old tests:
+    {
+      id: "viewer-1",
+      username: "viewer",
+      email: "viewer@epios.ai",
+      role: "viewer",
+      isActive: 1,
+    },
+    // compatibility with old tests and frontends:
     {
       id: "approver-1",
       username: "approver",
@@ -190,28 +197,78 @@ async function seed() {
       role: "contributor",
       isActive: 1,
     },
+    // underscore commercial seed identities:
+    {
+      id: "admin_1",
+      username: "admin_1",
+      email: "admin_1@epios.corp",
+      role: "admin",
+      isActive: 1,
+    },
+    {
+      id: "owner_1",
+      username: "owner_1",
+      email: "owner_1@epios.corp",
+      role: "reviewer",
+      isActive: 1,
+    },
+    {
+      id: "reviewer_1",
+      username: "reviewer_1",
+      email: "reviewer_1@epios.corp",
+      role: "reviewer",
+      isActive: 1,
+    },
+    {
+      id: "contributor_1",
+      username: "contributor_1",
+      email: "contributor_1@epios.corp",
+      role: "contributor",
+      isActive: 1,
+    },
+    {
+      id: "observer_1",
+      username: "observer_1",
+      email: "observer_1@epios.corp",
+      role: "observer",
+      isActive: 1,
+    },
   ]);
 
   const unit1_UUID = "00000000-0000-0000-0000-010000000001";
   const unit2_UUID = "00000000-0000-0000-0000-010000000002";
   const unit3_UUID = "00000000-0000-0000-0000-010000000003";
+  const unitCorp1_UUID = "00000000-0000-0000-0000-010000000101";
+  const unitCorp2_UUID = "00000000-0000-0000-0000-010000000102";
+  const unitCorp3_UUID = "00000000-0000-0000-0000-010000000103";
 
   await db.insert(schema.orgUnits).values([
     { id: unit1_UUID, name: "Governance Group" },
     { id: unit2_UUID, name: "Product Squad S7" },
     { id: unit3_UUID, name: "Security Audit Team" },
+    { id: unitCorp1_UUID, name: "Corporate Governance" },
+    { id: unitCorp2_UUID, name: "Product Engineering" },
+    { id: unitCorp3_UUID, name: "Security & Audit" },
   ]);
 
   const pos1_UUID = "00000000-0000-0000-0000-020000000001";
   const pos2_UUID = "00000000-0000-0000-0000-020000000002";
   const pos3_UUID = "00000000-0000-0000-0000-020000000003";
   const pos4_UUID = "00000000-0000-0000-0000-020000000004";
+  const posCorp1_UUID = "00000000-0000-0000-0000-020000000101";
+  const posCorp2_UUID = "00000000-0000-0000-0000-020000000102";
+  const posCorp3_UUID = "00000000-0000-0000-0000-020000000103";
+  const posCorp4_UUID = "00000000-0000-0000-0000-020000000104";
 
   await db.insert(schema.orgPositions).values([
     { id: pos1_UUID, name: "Principal Architect", level: 1 },
     { id: pos2_UUID, name: "Technical Lead", level: 2 },
     { id: pos3_UUID, name: "Security Officer", level: 2 },
     { id: pos4_UUID, name: "Senior Analyst", level: 3 },
+    { id: posCorp1_UUID, name: "Chief Architect", level: 1 },
+    { id: posCorp2_UUID, name: "Senior Governance Officer", level: 2 },
+    { id: posCorp3_UUID, name: "Lead Developer", level: 2 },
+    { id: posCorp4_UUID, name: "Associate Analyst", level: 3 },
   ]);
 
   await db.insert(schema.userAssignments).values([
@@ -229,6 +286,79 @@ async function seed() {
       role: "reviewer",
       unitId: unit2_UUID,
       positionId: pos2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000003",
+      userId: "approver-1",
+      role: "reviewer",
+      unitId: unit1_UUID,
+      positionId: pos1_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000004",
+      userId: "contributor-1",
+      role: "contributor",
+      unitId: unit2_UUID,
+      positionId: pos2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000005",
+      userId: "viewer-1",
+      role: "observer",
+      unitId: unit2_UUID,
+      positionId: pos4_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000006",
+      userId: "observer-1",
+      role: "observer",
+      unitId: unit2_UUID,
+      positionId: pos4_UUID,
+      isActive: true,
+    },
+    // Underscore assignments
+    {
+      id: "00000000-0000-0000-0000-030000000101",
+      userId: "admin_1",
+      role: "owner",
+      unitId: unitCorp1_UUID,
+      positionId: posCorp1_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000102",
+      userId: "owner_1",
+      role: "owner",
+      unitId: unitCorp1_UUID,
+      positionId: posCorp2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000103",
+      userId: "reviewer_1",
+      role: "reviewer",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp3_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000104",
+      userId: "contributor_1",
+      role: "contributor",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp4_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000105",
+      userId: "observer_1",
+      role: "observer",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp4_UUID,
       isActive: true,
     },
   ]);
