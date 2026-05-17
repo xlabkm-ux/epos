@@ -76,6 +76,9 @@
 | EPIOS-DEL-012| [Handover Report V2.4](../04_delivery/CURRENT_STATE_V2_4.md) | @architect | accepted_contract | 1.0 | 2026-05-15 | Delivery | - | v0.1.0-rc.1 | Mandatory |
 | EPIOS-DEL-013| [DEPLOY.md](../../DEPLOY.md) | @architect | accepted_contract | 1.0 | 2026-05-15 | Ops | - | v0.1.0-rc.1 | Mandatory |
 | EPIOS-DEL-007| [PROJECT_FIX_PLAN_LEGACY](../90_archive/delivery_legacy/PROJECT_FIX_PLAN.md) | @architect | historical_delivery | 1.1 | 2026-05-15 | Execution | - | v0.1.0-rc.1 | Advisory |
+| **CLIENT** | | | | | | |
+| EPIOS-CLI-001| [Client Methodology](../06_client/01_CLIENT_METHODOLOGY.md) | @architect | accepted_contract | 1.0 | 2026-05-17 | Methodology | - | v1.1 Alpha | Mandatory |
+| EPIOS-CLI-002| [Case Studies Showcase](../06_client/02_CASE_STUDIES.md) | @architect | accepted_contract | 1.0 | 2026-05-17 | Customer | - | v1.1 Alpha | Mandatory |
 | **REFERENCE / ROADMAPS** | | | | | | |
 | EPIOS-REF-001| [UI Roadmap](../20_reference/ui_roadmap/) | @architect | deferred | 0.1 | 2026-05-14 | UI | - | v1.1 Alpha | Advisory |
 | EPIOS-REF-002| [User Management](../20_reference/user_management/) | @architect | deferred | 0.1 | 2026-05-14 | Security | - | v1.1 Alpha | Advisory |

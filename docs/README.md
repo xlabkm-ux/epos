@@ -22,6 +22,7 @@ Roadmap documents are not backlog. Backlog lives in GitHub Issues.
 | **Decision** | Architecture Decision Records (ADRs) | `docs/02_adrs/` |
 | **Specs** | Technical contracts and specifications | `docs/03_specs/` |
 | **Delivery** | Release evidence and runbooks | `docs/04_delivery/` |
+| **Client** | Customer-facing and methodology guides | `docs/06_client/` |
 | **Reference** | Roadmaps and справочные материалы | `docs/20_reference/` |
 | **Archive** | Legacy and superseded docs | `docs/90_archive/` |
 
