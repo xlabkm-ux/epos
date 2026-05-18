@@ -127,7 +127,7 @@ const GraphCanvasInner: React.FC = () => {
         if (Array.isArray(nodesState) && nodesState.length > 0) {
           setNodes((currentNodes) => {
             return currentNodes.map((node) => {
-              const saved = nodesState.find((n: any) => n.id === node.id);
+              const saved = nodesState.find((n: Node) => n.id === node.id);
               return saved ? { ...node, position: saved.position } : node;
             });
           });

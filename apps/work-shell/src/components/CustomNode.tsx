@@ -43,30 +43,11 @@ const CustomNode = ({ data, selected }: NodeProps) => {
     
     // 2. Author role details
     const rawAuthor = data.createdById || "system";
-    let authorDetails = "";
-    if (rawAuthor === "approver") {
-      authorDetails = isRu ? "Координатор (approver)" : "Coordinator (approver)";
-    } else if (rawAuthor === "contributor") {
-      authorDetails = isRu ? "Аналитик (contributor)" : "Analyst (contributor)";
-    } else {
-      authorDetails = isRu ? "Система (system)" : "System (system)";
-    }
-
-    // 3. Category description
-    let definition = "";
-    if (typeLabel === "HYPOTHESIS") {
-      definition = isRu
-        ? "Гипотетический конструкт, требующий эмпирического подтверждения."
-        : "Hypothetical construct awaiting empirical validation.";
-    } else if (typeLabel === "EVIDENCE") {
-      definition = isRu
-        ? "Эмпирические данные, наблюдения или проверенный источник."
-        : "Empirical data, observation, or verified source material.";
-    } else {
-      definition = isRu
-        ? "Утверждение, аргумент или тезис."
-        : "Asserted statement, argument, or thesis.";
-    }
+    const authorDetails = rawAuthor === "approver"
+      ? (isRu ? "Координатор (approver)" : "Coordinator (approver)")
+      : rawAuthor === "contributor"
+      ? (isRu ? "Аналитик (contributor)" : "Analyst (contributor)")
+      : (isRu ? "Система (system)" : "System (system)");
 
     // 4. Traceability info
     const traceability = typeLabel === "EVIDENCE"
