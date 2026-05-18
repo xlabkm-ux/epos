@@ -49,6 +49,7 @@
 | EPIOS-ADR-025| [ADR-0025: Clean Rewrite](../02_adrs/ADR-0025-reuse-strategy.md) | @architect | accepted | 0.1 | 2026-05-12 | Legacy | - | v0.1.0-rc.1 | Mandatory |
 | EPIOS-ADR-026| [ADR-0026: License](../02_adrs/ADR-0026-license-choice.md) | @architect | accepted | 0.1 | 2026-05-12 | Legal | - | v0.1.0-rc.1 | Mandatory |
 | EPIOS-ADR-099| [ADR-0099: Audit Directives](../02_adrs/ADR-0099-mvp-audit-directives.md) | @architect | accepted | 1.0 | 2026-05-15 | Audit | - | v0.1.0-rc.1 | Mandatory |
+| EPIOS-ADR-TPL| [ADR Template](../02_adrs/ADR_TEMPLATE.md) | @architect | reference | 0.1 | 2026-05-18 | Template | - | All | Advisory |
 | **SPECS** | | | | | | |
 | EPIOS-SPC-001| [APPLICATION_USE_CASE_CONTRACTS.md](../03_specs/APPLICATION_USE_CASE_CONTRACTS.md) | @architect | accepted_concept | 0.2 | 2026-05-15 | Specs | - | v1.0 MVP | Mandatory |
 | EPIOS-SPC-002| [ERROR_CATALOG.md](../03_specs/ERROR_CATALOG.md) | @architect | accepted_contract | 0.2 | 2026-05-15 | Specs | - | v1.0 MVP | Mandatory |
@@ -133,3 +134,21 @@
 | EPIOS-ARC-006| [Old Demo & Pilot Docs](../90_archive/delivery_legacy/) | @architect | archived | 0.1 | 2026-05-15 | Demo | - | - | Advisory |
 | EPIOS-ARC-013| [Sprint Plan Snapshot](../90_archive/delivery_legacy/SPRINT_DEVELOPMENT_PLAN_MVP.md) | @architect | advisory_snapshot | 0.1 | 2026-05-15 | Planning | - | - | Advisory |
 | EPIOS-ARC-014| [Week 6 Plan Snapshot](../90_archive/delivery_legacy/WEEK_6_PLAN.md) | @architect | historical_delivery | 0.1 | 2026-05-15 | Delivery | - | - | Advisory |
+| EPIOS-ARC-015| [PROJECT_BACKLOG_LEGACY.md](../90_archive/PROJECT_BACKLOG_LEGACY.md) | @architect | archived | 0.1 | 2026-05-18 | Backlog Archive | - | Legacy | Advisory |
+| EPIOS-ARC-016| [STATUS_ARCHIVED_2026-05-15.md](../90_archive/STATUS_ARCHIVED_2026-05-15.md) | @architect | archived | 0.1 | 2026-05-18 | Status Archive | - | Legacy | Advisory |
+| EPIOS-ARC-017| [STATUS_ARCHIVED_2026-05-16.md](../90_archive/STATUS_ARCHIVED_2026-05-16.md) | @architect | archived | 0.1 | 2026-05-18 | Status Archive | - | Legacy | Advisory |
+| EPIOS-ARC-018| [BACKLOG_MIGRATION_LOG.md](../90_archive/backlog/BACKLOG_MIGRATION_LOG.md) | @architect | archived | 0.1 | 2026-05-18 | Backlog Archive | - | Legacy | Advisory |
+| EPIOS-ARC-019| [GITHUB_ISSUES_BACKLOG.md](../90_archive/backlog/GITHUB_ISSUES_BACKLOG.md) | @architect | archived | 0.1 | 2026-05-18 | Backlog Archive | - | Legacy | Advisory |
+| EPIOS-ARC-020| [DEMO_RUNBOOK_ADR_REVIEW.md](../90_archive/delivery_legacy/DEMO_RUNBOOK_ADR_REVIEW.md) | @architect | archived | 0.1 | 2026-05-18 | Demo Archive | - | Legacy | Advisory |
+| EPIOS-ARC-021| [DEMO_SCENARIOS.md](../90_archive/delivery_legacy/DEMO_SCENARIOS.md) | @architect | archived | 0.1 | 2026-05-18 | Demo Archive | - | Legacy | Advisory |
+| EPIOS-ARC-022| [EPIOS_v1_1_Phase_A_S0_S1_Governance_Contracts_QA.md](../90_archive/delivery_legacy/EPIOS_v1_1_Phase_A_S0_S1_Governance_Contracts_QA.md) | @architect | archived | 0.1 | 2026-05-18 | QA Archive | - | Legacy | Advisory |
+| EPIOS-ARC-023| [EPIOS_v1_1_Phase_B_S2_S3_Domain_Async_QA.md](../90_archive/delivery_legacy/EPIOS_v1_1_Phase_B_S2_S3_Domain_Async_QA.md) | @architect | archived | 0.1 | 2026-05-18 | QA Archive | - | Legacy | Advisory |
+| EPIOS-ARC-024| [EPIOS_v1_1_Phase_C_S4_S5_Patch_Readiness_QA.md](../90_archive/delivery_legacy/EPIOS_v1_1_Phase_C_S4_S5_Patch_Readiness_QA.md) | @architect | archived | 0.1 | 2026-05-18 | QA Archive | - | Legacy | Advisory |
+| EPIOS-ARC-025| [EPIOS_v1_1_Phase_D_S6_S7_Hardening_RC_QA.md](../90_archive/delivery_legacy/EPIOS_v1_1_Phase_D_S6_S7_Hardening_RC_QA.md) | @architect | archived | 0.1 | 2026-05-18 | QA Archive | - | Legacy | Advisory |
+| EPIOS-ARC-026| [PILOT_FEEDBACK_FORM.md](../90_archive/delivery_legacy/PILOT_FEEDBACK_FORM.md) | @architect | archived | 0.1 | 2026-05-18 | Pilot Archive | - | Legacy | Advisory |
+| EPIOS-ARC-027| [SPRINT_PLAN_ADR_0099_HARDENING.md](../90_archive/delivery_legacy/SPRINT_PLAN_ADR_0099_HARDENING.md) | @architect | archived | 0.1 | 2026-05-18 | Sprint Archive | - | Legacy | Advisory |
+| EPIOS-ARC-028| [V1.0_QA_FINAL_REPORT.md](../90_archive/delivery_legacy/V1.0_QA_FINAL_REPORT.md) | @architect | archived | 0.1 | 2026-05-18 | QA Archive | - | Legacy | Advisory |
+| EPIOS-ARC-029| [WEEK_4_PLAN.md](../90_archive/delivery_legacy/WEEK_4_PLAN.md) | @architect | archived | 0.1 | 2026-05-18 | Sprint Archive | - | Legacy | Advisory |
+| EPIOS-ARC-030| [WEEK_5_PLAN.md](../90_archive/delivery_legacy/WEEK_5_PLAN.md) | @architect | archived | 0.1 | 2026-05-18 | Sprint Archive | - | Legacy | Advisory |
+| EPIOS-ARC-031| [EPIOS_v1_1_Master_Sprint_QA_Plan.md](../90_archive/qa_legacy/EPIOS_v1_1_Master_Sprint_QA_Plan.md) | @architect | archived | 0.1 | 2026-05-18 | QA Legacy | - | Legacy | Advisory |
+| EPIOS-ARC-032| [EPIOS_v1_1_QA_Matrix_Test_Cases.md](../90_archive/qa_legacy/EPIOS_v1_1_QA_Matrix_Test_Cases.md) | @architect | archived | 0.1 | 2026-05-18 | QA Legacy | - | Legacy | Advisory |
