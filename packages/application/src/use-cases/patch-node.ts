@@ -6,7 +6,7 @@ export type PatchNodeRequest = {
   type?: EpistemicNode["type"];
   content?: string;
   strength?: NodeStrength;
-  evidence?: EvidenceRef[];
+  // evidence?: EvidenceRef[]; // TODO: Evidence is now handled via EvidenceSet
   metadata?: Record<string, unknown>;
 };
 
@@ -21,7 +21,7 @@ export class PatchNodeUseCase {
 
     if (request.content !== undefined) node.updateContent(request.content);
     if (request.strength !== undefined) node.setStrength(request.strength);
-    if (request.evidence !== undefined) node.replaceEvidence(request.evidence);
+    // if (request.evidence !== undefined) node.replaceEvidence(request.evidence);
     if (request.metadata !== undefined) node.updateMetadata(request.metadata);
     // if (request.type !== undefined) node.updateType(request.type);
     // Wait, I didn't add updateType yet. Let's just skip it or add it if it's important.

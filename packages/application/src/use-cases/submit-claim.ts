@@ -3,19 +3,29 @@ import {
   EpistemicNode,
   EpistemicNodeProps,
 } from "@epios/domain";
-import { UnitOfWorkPort } from "@epios/ports";
+import { UnitOfWorkPort, SecurityPort } from "@epios/ports";
 import { randomUUID } from "node:crypto";
 
 export interface SubmitClaimRequest {
   workspaceId: string;
+  missionId: string;
   content: string;
   requiredVotes?: number;
 }
 
 export class SubmitClaimUseCase {
-  constructor(private readonly uowProvider: UnitOfWorkPort) {}
+  constructor(
+    private readonly uowProvider: UnitOfWorkPort,
+    private readonly security: SecurityPort,
+  ) {}
 
   async execute(request: SubmitClaimRequest): Promise<EpistemicNodeProps> {
+    await this.security.authorize(
+      "contributor",
+      "submit_claim",
+      request.workspaceId,
+    );
+
     return await this.uowProvider.runInTransaction(async (uow) => {
       const claimId = randomUUID();
       const now = new Date();
@@ -23,10 +33,10 @@ export class SubmitClaimUseCase {
       const claim = new EpistemicNode({
         id: claimId,
         workspaceId: request.workspaceId,
+        missionId: request.missionId,
         type: "claim",
         content: request.content,
         strength: "none",
-        evidence: [],
         metadata: {},
         version: 1,
         createdAt: now,

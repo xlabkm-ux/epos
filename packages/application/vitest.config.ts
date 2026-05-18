@@ -22,6 +22,10 @@ export default defineConfig({
       "@epios/domain": path.resolve(__dirname, "../domain/src"),
       "@epios/ports": path.resolve(__dirname, "../ports/src"),
       "@epios/observability": path.resolve(__dirname, "../observability/src"),
+      "@epios/infrastructure-runtime": path.resolve(
+        __dirname,
+        "../infrastructure-runtime/src",
+      ),
     },
   },
 });

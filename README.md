@@ -33,19 +33,32 @@ cd epios
 pnpm install
 ```
 
-### 2. Infrastructure
-EPIOS supports both containerized and bare-metal environments. 
-- **Docker Compose**: Used for infrastructure dependencies (PostgreSQL).
-- **PM2 / Bare Metal**: Used for application process management (see `ecosystem.config.cjs`).
+### 2. Run with Docker (Recommended)
+EPIOS is now fully containerized for easy pilot deployment.
 
-Start the PostgreSQL database:
 ```bash
-docker-compose up -d
+# Start all services (Postgres, API, UI)
+docker compose up -d
+
+# Initialize with Pilot Pack data
+docker exec -it epios-api pnpm --filter @epios/infrastructure-postgres seed
 ```
+- **Demo Shell**: [http://localhost:5173](http://localhost:5173)
+- **API Server**: [http://localhost:3000](http://localhost:3000)
 
-### 3. Run Development Environment
-Launch the API and the Demo Shell simultaneously:
+For detailed operational instructions, see the **[📘 RUNBOOK.md](docs/05_operations/RUNBOOK.md)**.
+
+### 3. Development Environment
+If you prefer to run locally for development:
+
 ```bash
+# Start Postgres only
+pnpm db:up
+
+# Run migrations and seed
+pnpm db:init
+
+# Launch API and UI
 pnpm dev
 ```
 The **Demo Shell** will be available at `http://localhost:5173`.
@@ -66,7 +79,7 @@ EPIOS follows a layered hexagonal architecture. The monorepo structure strictly 
 ```mermaid
 graph TD
     subgraph Apps [Interfaces Layer]
-        Shell[demo-shell: React/Vite]
+        Shell[work-shell: React/Vite]
     end
 
     subgraph Packages [Core Layers]
@@ -85,7 +98,7 @@ graph TD
 ```
 
 ### Physical Directory Mapping
-- **`apps/demo-shell`**: The primary "Mission Room" UI.
+- **`apps/work-shell`**: The primary "Mission Room" UI.
 - **`packages/domain`**: Pure business logic, entities (`EpistemicNode`), and invariants.
 - **`packages/application`**: Orchestration and use cases (e.g., `SubmitClaim`, `ApplyPatch`).
 - **`packages/api`**: HTTP interface and DTO validation.

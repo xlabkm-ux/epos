@@ -1,10 +1,10 @@
-Owner: @architect
+**Owner**: @architect
+**Status**: accepted_contract
 
 # EPIOS — v1.1 ADR Review Roadmap
 
 **Project:** Epistemic OS v1.1
 **Document ID:** `EPIOS-V1_1-ADR-REVIEW-ROADMAP`
-**Status:** Planning
 **Target Horizon:** 16 sprints
 
 ---
@@ -22,7 +22,16 @@ Building upon the v1.0 foundation, v1.1 focuses on the **ADR Review Workspace** 
 
 ## 3. 16-Sprint Milestone Plan
 
-- **Sprints 1-4**: Stabilization of v1.0 core and initial ADR domain models.
-- **Sprints 5-8**: High-integrity MCP bridge extensions for complex decision support.
-- **Sprints 9-12**: Multi-user governance and consensus protocols.
-- **Sprints 13-16**: Finalization of the ADR Review Workspace and pilot release.
+Target horizon: 16 sprints + pilot/fix window
+
+Milestones:
+  S1-S4   core/domain/API stabilization
+  S5-S8   MCP decision-support bridge
+  S9-S12  multi-user governance
+  S13-S16 pilot release hardening
+
+Non-goals:
+  no universal enterprise platform in v1.1
+  no autonomous write agent
+  no truth/coherence score
+  no direct MCP domain mutation

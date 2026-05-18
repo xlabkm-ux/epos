@@ -3,6 +3,18 @@ Status: Accepted_concept
 
 # Каноничный Workflow: ADR Review (MVP v1.1)
 
+## Executable Contract
+
+- Public contract
+- State machine
+- Input DTO
+- Output DTO
+- Error codes
+- Trace events
+- Idempotency rules
+- Security checks
+- Acceptance tests
+
 Этот документ описывает основной рабочий процесс (Happy Path), вокруг которого был построен MVP v1.1. Это гибридный процесс, сочетающий когнитивную работу человека и аналитику AI (MCP).
 
 ## Сценарий: Оценка внедрения Event Sourcing

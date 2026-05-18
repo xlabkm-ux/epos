@@ -17,5 +17,33 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      target: api
+    container_name: epios-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-epios}:${POSTGRES_PASSWORD:-epios_dev_password}@postgres:5432/${POSTGRES_DB:-epios_dev}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  work-shell:
+    build:
+      context: .
+      target: work-shell
+    container_name: epios-work-shell
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - api
+
 volumes:
   epios_postgres_data:

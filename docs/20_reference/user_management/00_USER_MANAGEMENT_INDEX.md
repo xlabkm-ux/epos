@@ -20,9 +20,10 @@ Status: accepted
 В соответствии с этими требованиями, раздел разбит на 5 ключевых документов:
 
 ### 1. [01_IDENTITY_AND_ACCESS_MODEL.md](./01_IDENTITY_AND_ACCESS_MODEL.md)
-Базовая доменная модель (`User`, `UserRole`, `Permission`) и матрица доступа (Access Control Matrix) для ролей `admin`, `reviewer`, `observer`.
+Базовая модель: **Рабочее место (WP)** vs **Рабочее пространство (WS)**. Матрица доступа для ролей (Owner, Reviewer и т.д.) через Таблицу назначений.
 
 ### 2. [02_PROVISIONING_AND_LIFECYCLE.md](./02_PROVISIONING_AND_LIFECYCLE.md)
+Регламент обязательной регистрации, аутентификации (AuthScreen) и жизненного цикла WP.
 Архитектура регистрации, интеграция с корпоративным SSO (OIDC/SAML) и процессы деактивации (Offboarding).
 
 ### 3. [03_DATA_SECURITY_AND_RETENTION.md](./03_DATA_SECURITY_AND_RETENTION.md)
@@ -34,3 +35,11 @@ Status: accepted
 ### 5. [05_RBAC_DEVELOPMENT_PLAN.md](./05_RBAC_DEVELOPMENT_PLAN.md)
 Roadmap реализации недостающих административных интерфейсов (RBAC Admin UI) и доработок бэкенда.
 
+### 6. [06_ADMIN_REGULATIONS.md](./06_ADMIN_REGULATIONS.md)
+Обязанности администратора по ведению **Таблицы назначений (WP Management)** и управлению квотами.
+
+### 7. [08_DATABASE_SCHEMA_V2.md](./08_DATABASE_SCHEMA_V2.md)
+Техническая спецификация таблиц БД для обеспечения структуры WP/WS (org_units, org_positions, user_assignments).
+
+### 🚀 [OPTIMIZED_PLAN.md](./OPTIMIZED_PLAN.md)
+Предложения по архитектурной оптимизации: контекстный RBAC, глубокое маскирование и Policy-as-Code.

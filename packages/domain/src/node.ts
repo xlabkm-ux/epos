@@ -16,25 +16,21 @@ export type NodeStrength =
   | "strong"
   | "indisputable";
 
-export type EvidenceRef = {
-  id: string;
-  sourceType: string;
-  sourceUri: string;
-  snippet?: string;
-  timestamp: Date;
-};
+// Evidence is now handled by EvidenceSet entity
 
 export interface EpistemicNodeProps {
   id: string;
   workspaceId: string;
+  missionId: string;
   type: NodeType;
   content: string;
   strength: NodeStrength;
-  evidence: EvidenceRef[];
+  evidenceSetId?: string;
   metadata: Record<string, unknown>;
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  createdById?: string;
 }
 
 export class EpistemicNode {
@@ -50,6 +46,8 @@ export class EpistemicNode {
     if (!this.props.id) throw new ValidationError("NODE_ID_REQUIRED");
     if (!this.props.workspaceId)
       throw new ValidationError("WORKSPACE_ID_REQUIRED");
+    if (!this.props.missionId)
+      throw new ValidationError("MISSION_ID_REQUIRED");
     if (!this.props.content?.trim())
       throw new ValidationError("NODE_CONTENT_REQUIRED");
   }
@@ -60,6 +58,9 @@ export class EpistemicNode {
   get workspaceId() {
     return this.props.workspaceId;
   }
+  get missionId() {
+    return this.props.missionId;
+  }
   get type() {
     return this.props.type;
   }
@@ -69,8 +70,8 @@ export class EpistemicNode {
   get strength() {
     return this.props.strength;
   }
-  get evidence() {
-    return this.props.evidence;
+  get evidenceSetId() {
+    return this.props.evidenceSetId;
   }
   get metadata() {
     return this.props.metadata;
@@ -83,6 +84,9 @@ export class EpistemicNode {
   }
   get updatedAt() {
     return this.props.updatedAt;
+  }
+  get createdById() {
+    return this.props.createdById;
   }
 
   public toJSON() {
@@ -132,8 +136,8 @@ export class EpistemicNode {
     });
   }
 
-  public addEvidence(evidence: EvidenceRef): void {
-    this.props.evidence = [...this.props.evidence, evidence];
+  public linkEvidenceSet(evidenceSetId: string): void {
+    this.props.evidenceSetId = evidenceSetId;
     this.props.updatedAt = new Date();
     this.props.version++;
   }
@@ -144,11 +148,7 @@ export class EpistemicNode {
     this.props.version++;
   }
 
-  public replaceEvidence(evidence: EvidenceRef[]): void {
-    this.props.evidence = [...evidence];
-    this.props.updatedAt = new Date();
-    this.props.version++;
-  }
+  // Evidence replacement is now handled at the EvidenceSet level
 
   public toProps(): EpistemicNodeProps {
     return { ...this.props };

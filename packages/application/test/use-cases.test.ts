@@ -45,6 +45,11 @@ const mockOutboxRepo = {
   save: vi.fn(),
 } as any;
 
+const mockSecurity = {
+  authorize: vi.fn().mockResolvedValue(true),
+  getCurrentWorkPlace: vi.fn().mockResolvedValue({ id: "wp-1", role: "admin" }),
+} as any;
+
 const mockUnitOfWork = {
   workspaceRepository: mockWorkspaceRepo,
   graphRepository: mockGraphRepo,
@@ -54,7 +59,8 @@ const mockUnitOfWork = {
 
 const mockUowProvider = {
   runInTransaction: vi.fn((fn) => fn(mockUnitOfWork)),
-} as unknown as UnitOfWorkPort;
+  security: mockSecurity,
+} as any;
 
 describe("Use Cases", () => {
   beforeEach(() => {
@@ -92,6 +98,7 @@ describe("Use Cases", () => {
 
       const request = {
         workspaceId: "workspace-1",
+        missionId: "mission-1",
         type: "claim" as const,
         content: "Test Claim",
       };
@@ -109,6 +116,7 @@ describe("Use Cases", () => {
 
       const request = {
         workspaceId: "invalid",
+        missionId: "mission-1",
         type: "claim" as const,
         content: "Test",
       };
@@ -163,11 +171,12 @@ describe("Use Cases", () => {
         new EpistemicNode({
           id: "node-1",
           workspaceId: "workspace-1",
+          missionId: "mission-1",
           type: "claim",
           content: "Old Content",
           strength: "none",
-          evidence: [],
           metadata: { key: "old" },
+          version: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         }),
@@ -201,9 +210,10 @@ describe("Use Cases", () => {
 
   describe("SubmitClaimUseCase", () => {
     it("should submit a claim and create a governance process", async () => {
-      const useCase = new SubmitClaimUseCase(mockUowProvider);
+      const useCase = new SubmitClaimUseCase(mockUowProvider, mockSecurity);
       const request = {
         workspaceId: "workspace-1",
+        missionId: "mission-1",
         content: "New Claim Content",
       };
 
@@ -218,7 +228,7 @@ describe("Use Cases", () => {
 
   describe("CastVoteUseCase", () => {
     it("should cast a vote and keep status as pending if threshold not met", async () => {
-      const useCase = new CastVoteUseCase(mockUowProvider);
+      const useCase = new CastVoteUseCase(mockUowProvider, mockSecurity);
       const mockProcess = new GovernanceProcess({
         nodeId: "node-1",
         workspaceId: "workspace-1",
@@ -246,7 +256,7 @@ describe("Use Cases", () => {
     });
 
     it("should finalize process as approved if threshold met", async () => {
-      const useCase = new CastVoteUseCase(mockUowProvider);
+      const useCase = new CastVoteUseCase(mockUowProvider, mockSecurity);
       const mockProcess = new GovernanceProcess({
         nodeId: "node-1",
         workspaceId: "workspace-1",
@@ -265,11 +275,12 @@ describe("Use Cases", () => {
         new EpistemicNode({
           id: "node-1",
           workspaceId: "workspace-1",
+          missionId: "mission-1",
           type: "claim",
           content: "Test",
           strength: "none",
-          evidence: [],
           metadata: {},
+          version: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         }),
@@ -292,7 +303,7 @@ describe("Use Cases", () => {
     });
 
     it("should finalize process as rejected if rejection threshold met", async () => {
-      const useCase = new CastVoteUseCase(mockUowProvider);
+      const useCase = new CastVoteUseCase(mockUowProvider, mockSecurity);
       const mockProcess = new GovernanceProcess({
         nodeId: "node-1",
         workspaceId: "workspace-1",
@@ -322,7 +333,7 @@ describe("Use Cases", () => {
     });
 
     it("should throw if process not found", async () => {
-      const useCase = new CastVoteUseCase(mockUowProvider);
+      const useCase = new CastVoteUseCase(mockUowProvider, mockSecurity);
       vi.mocked(mockGovernanceRepo.findProcessByNodeId).mockResolvedValue(null);
 
       const request = {
@@ -337,7 +348,7 @@ describe("Use Cases", () => {
     });
 
     it("should throw if process already finalized", async () => {
-      const useCase = new CastVoteUseCase(mockUowProvider);
+      const useCase = new CastVoteUseCase(mockUowProvider, mockSecurity);
       vi.mocked(mockGovernanceRepo.findProcessByNodeId).mockResolvedValue(
         new GovernanceProcess({
           nodeId: "node-1",
@@ -364,7 +375,7 @@ describe("Use Cases", () => {
 
   describe("ListWorkspacesUseCase", () => {
     it("should list all workspaces", async () => {
-      const useCase = new ListWorkspacesUseCase(mockWorkspaceRepo);
+      const useCase = new ListWorkspacesUseCase(mockWorkspaceRepo, mockSecurity);
       vi.mocked(mockWorkspaceRepo.findAll).mockResolvedValue([
         { id: "w1", title: "W1" },
       ] as unknown as Workspace[]);

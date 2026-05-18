@@ -225,10 +225,21 @@ type GovernanceFinding \= {
 
 ## **📋 Governance Enforcement**
 
-**Status tracking is explicitly excluded from this document to prevent documentation drift.**
+### **Delivery Enforcement & Hygiene**
 
-* **Live Execution Truth:** [GitHub Issues](https://github.com/xlabkm-ux/epios/issues)
-* **Release Status:** [RELEASE_STATE.md](../04_delivery/RELEASE_STATE.md)
-* **Compliance Checks:** Automated via `pnpm verify` (CI).
+1. **No Direct Push**: All changes to `main` and `develop` MUST go through a Pull Request.
+2. **Issue Traceability**: Every PR MUST link to at least one GitHub Issue using the `Closes #ID` or `Related to #ID` syntax.
+3. **CI Dependency**: PRs cannot be merged without a green `pnpm verify` run.
+4. **Fresh Delivery Rule**: To prevent documentation drift and cognitive load, the `docs/04_delivery/` folder must contain ONLY active or upcoming plans.
+    *   Once a sprint or phase is completed and reviewed, the corresponding document MUST be set to `archived` status and moved to `docs/90_archive/` within 24 hours.
+    *   Successful completion is not a reason to keep a plan in the active folder; its "truth" is now in the codebase and the `STATUS.md` dashboard.
+5. **2-Level Planning & Sprint Isolation**:
+    * **Двухуровневое планирование**: Отказ от понедельного планирования. Используется Проектный план (глобальные фазы) и Оперативный план (`STATUS.md`).
+    * **Изоляция спринтов**: Оперативный план состоит из согласованных этапов, разбитых на **НЕЗАВИСИМЫЕ** спринты, которые можно выполнять параллельно.
+    * **Уникальные спринты**: Если спринт затрагивает критически важные части системы и создает риски для разработки, он помечается как `[🔒 УНИКАЛЬНЫЙ]` и строго **запрещает параллельную разработку**.
 
-Any changes to this governance policy must be proposed via an ADR and implemented through a Pull Request.
+**Live Execution Truth:** [GitHub Issues](https://github.com/xlabkm-ux/epios/issues)
+**Release Status:** [RELEASE_STATE.md](../04_delivery/RELEASE_STATE.md)
+**Compliance Checks:** Automated via `pnpm verify` (CI).
+
+Any changes to this governance policy must be proposed via an ADR and implemented through a Pull Request.

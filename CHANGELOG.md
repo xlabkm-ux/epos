@@ -22,9 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored anemic domain models to rich models with strict invariants.
 
 ### Fixed
-- Idempotency handling in mission/workspace creation.
-- Security vulnerabilities in regex-based scanners.
-- Documentation drift and inconsistent release statuses.
+- Resolved build-time export collisions for `ApprovalStatus` and `SourceRepositoryPort`.
+- Fixed `packages/domain` test failures by reconciling `Mission` entity invariants.
+- Remediated `packages/api` E2E regressions by updating mocks to match modernized domain models.
+- Corrected application layer export mismatches (e.g., `AddSource` vs `IngestSource`).
+- Implemented idempotency in `RunMappingUseCase`.
+- Fixed documentation drift and inconsistent release statuses.
 
 ## [0.1.0-alpha] - 2026-05-10
 - Initial bootstrap of the project.

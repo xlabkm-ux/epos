@@ -8,6 +8,7 @@
 | **Status** | `rc` (Release Candidate) |
 | **Release Date** | 2026-05-15 |
 | **Milestone** | MVP Stabilization |
+| **GitHub Release** | [PUBLISHED] (v0.1.0-rc.1) |
 
 ## 2. Release Status Definitions
 - `rc`: Release Candidate. Feature complete for scope, undergoing hardening.

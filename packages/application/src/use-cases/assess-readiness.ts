@@ -21,36 +21,43 @@ export class AssessReadinessUseCase {
     // Simple heuristic for readiness v1.1
     // Evidence Coverage
     const nodesWithEvidence = nodes.filter(
-      (n) => n.evidence && n.evidence.length > 0,
+      (n) => n.evidenceSetId !== undefined,
     ).length;
     const coverageRatio =
       nodes.length > 0 ? nodesWithEvidence / nodes.length : 0;
-    const coverage: "high" | "medium" | "low" =
+    const coverage: "low" | "medium" | "high" =
       coverageRatio > 0.8 ? "high" : coverageRatio > 0.4 ? "medium" : "low";
 
     // Traceability
     const processes = await this.governanceRepo.findProcessesByWorkspaceId(
       request.workspaceId,
     );
-    let traceability: "complete" | "partial" | "missing" = "missing";
+    let traceability: "missing" | "partial" | "full" = "missing";
     if (processes.length > 0) traceability = "partial";
     if (processes.length > 0 && processes.every((p) => p.status !== "pending"))
-      traceability = "complete";
+      traceability = "full";
 
     // Risk Handling
     const risks = nodes.filter((n) => n.type === "risk").length;
-    let riskHandling: "explicit" | "weak" | "missing" = "missing";
+    let riskHandling: "absent" | "implicit" | "explicit" = "absent";
     if (risks > 2) riskHandling = "explicit";
-    else if (risks > 0) riskHandling = "weak";
+    else if (risks > 0) riskHandling = "implicit";
 
     // Status
+    // Hard block: any indicator at floor level -> blocked regardless of score
+    const hardBlocks: string[] = [];
+    if (riskHandling === "absent") hardBlocks.push("No risk nodes identified");
+    if (coverage === "low") hardBlocks.push("Evidence coverage below 40%");
+    if (traceability === "missing")
+      hardBlocks.push("No governance processes found");
+
     const readiness: ReadinessStatus =
-      coverage === "high" &&
-      traceability === "complete" &&
-      riskHandling === "explicit"
-        ? "ready"
-        : riskHandling === "missing"
-          ? "blocked"
+      hardBlocks.length > 0
+        ? "blocked"
+        : coverage === "high" &&
+            traceability === "full" &&
+            riskHandling === "explicit"
+          ? "ready"
           : "needs_review";
 
     const score = Math.round(coverageRatio * 100);
@@ -67,7 +74,10 @@ export class AssessReadinessUseCase {
         riskHandling: riskHandling,
       },
       numericScore: score,
-      explanation: `Readiness: ${readiness}. Score: ${score}%. Evidence Coverage: ${coverage}. Traceability: ${traceability}.`,
+      explanation:
+        hardBlocks.length > 0
+          ? `BLOCKED: ${hardBlocks.join("; ")}. Score: ${score}%.`
+          : `Readiness: ${readiness}. Score: ${score}%. Evidence Coverage: ${coverage}. Traceability: ${traceability}. Risk Handling: ${riskHandling}.`,
       createdAt: new Date(),
     };
 

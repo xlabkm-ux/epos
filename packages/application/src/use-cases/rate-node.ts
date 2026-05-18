@@ -15,7 +15,8 @@ export class RateNodeUseCase {
   async execute(request: RateNodeRequest): Promise<Rating> {
     const rating: Rating = {
       id: randomUUID(),
-      nodeId: request.nodeId,
+      subjectId: request.nodeId,
+      subjectType: "node",
       actorId: request.actorId,
       value: request.value,
       comment: request.comment,

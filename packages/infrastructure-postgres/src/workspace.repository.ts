@@ -53,15 +53,16 @@ export class PostgresWorkspaceRepository implements WorkspaceRepositoryPort {
           unknowns: workspace.brief.unknowns,
           desiredArtifactType: workspace.desiredArtifactType,
           updatedAt: workspace.updatedAt,
-          version: sql`${workspaces.version} + 1`,
+          version: workspace.version,
           isPinned: workspace.isPinned ?? false,
-          archivedAt: workspace.archivedAt,
-          archiveComment: workspace.archiveComment,
+          archivedAt: workspace.archivedAt ?? null,
+          archiveComment: workspace.archiveComment ?? null,
         })
+
         .where(
           and(
             eq(workspaces.id, workspace.id),
-            eq(workspaces.version, workspace.version),
+            eq(workspaces.version, existing.version),
           ),
         )
         .returning();

@@ -1,5 +1,9 @@
 import { NodePatch, GovernanceProcess } from "@epios/domain";
-import { GovernanceRepositoryPort, GraphRepositoryPort } from "@epios/ports";
+import {
+  GovernanceRepositoryPort,
+  GraphRepositoryPort,
+  SecurityPort,
+} from "@epios/ports";
 import { randomUUID } from "crypto";
 
 export interface ProposePatchRequest {
@@ -14,9 +18,16 @@ export class ProposePatchUseCase {
   constructor(
     private governanceRepo: GovernanceRepositoryPort,
     private graphRepo: GraphRepositoryPort,
+    private security: SecurityPort,
   ) {}
 
   async execute(request: ProposePatchRequest): Promise<NodePatch> {
+    await this.security.authorize(
+      "contributor",
+      "propose_patch",
+      request.targetNodeId,
+    );
+
     const node = await this.graphRepo.findNodeById(request.targetNodeId);
     if (!node) {
       throw new Error("TARGET_NODE_NOT_FOUND");

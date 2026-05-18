@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { StartMappingRunUseCase } from "../src/use-cases/start-mapping-run";
-import { randomUUID } from "crypto";
+import { RunMappingUseCase } from "../src/use-cases/run-mapping.js";
+import { randomUUID } from "node:crypto";
 import { MappingRepositoryPort, OutboxRepositoryPort } from "@epios/ports";
 
 describe("Async Runtime & Idempotency", () => {
@@ -8,34 +8,49 @@ describe("Async Runtime & Idempotency", () => {
     const mappingRepo = {
       save: vi.fn(),
       findById: vi.fn(),
-      listByWorkspace: vi.fn(),
-      delete: vi.fn(),
+      findByMissionId: vi.fn(),
     };
     const outboxRepo = {
       save: vi.fn(),
-      findPending: vi.fn(),
-      markProcessed: vi.fn(),
-      markFailed: vi.fn(),
+    };
+    const missionRepo = {
+      findById: vi.fn(),
     };
 
-    const useCase = new StartMappingRunUseCase(
-      mappingRepo as unknown as MappingRepositoryPort,
-      outboxRepo as unknown as OutboxRepositoryPort,
+    const mockUnitOfWork = {
+      missionRepository: missionRepo,
+      missionRunRepository: mappingRepo,
+      governanceRepository: { saveTraceEvent: vi.fn() },
+      outboxRepository: outboxRepo,
+    };
+
+    const mockUowProvider = {
+      runInTransaction: vi.fn((fn) => fn(mockUnitOfWork)),
+    };
+
+    const mockSecurity = {
+      authorize: vi.fn().mockResolvedValue(true),
+    };
+
+    const useCase = new RunMappingUseCase(
+      mockUowProvider as any,
+      mockSecurity as any,
     );
 
-    const workspaceId = randomUUID();
-    const idempotencyKey = randomUUID();
+    const missionId = randomUUID();
+    const actorId = "user-1";
 
     // First call
-    mappingRepo.findById.mockResolvedValue(null);
-    const run1 = await useCase.execute({ workspaceId, idempotencyKey });
+    missionRepo.findById.mockResolvedValue({ id: missionId, workspaceId: "w1" });
+    mappingRepo.findByMissionId.mockResolvedValue([]);
+    const run1 = await useCase.execute({ missionId, sourceIds: [], actorId });
 
     // Second call
-    mappingRepo.findById.mockResolvedValue(run1);
-    const run2 = await useCase.execute({ workspaceId, idempotencyKey });
+    mappingRepo.findByMissionId.mockResolvedValue([run1]);
+    const run2 = await useCase.execute({ missionId, sourceIds: [], actorId });
 
-    expect(run1.id).toBe(idempotencyKey);
-    expect(run2.id).toBe(idempotencyKey);
+    expect(run1.id).toBeDefined();
+    expect(run2.id).toBe(run1.id);
     expect(mappingRepo.save).toHaveBeenCalledTimes(1);
   });
 

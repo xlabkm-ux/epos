@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import * as dotenv from "dotenv";
 import { expand } from "dotenv-expand";
 import * as schema from "./schema.js";
+import { createMockData } from "../../api/src/mock-data.js";
 
 const envConfig = dotenv.config({ path: "../../.env" });
 expand(envConfig);
@@ -15,363 +16,503 @@ if (!databaseUrl) {
 const queryClient = postgres(databaseUrl);
 const db = drizzle(queryClient, { schema });
 
+// --- DETERMINISTIC UUID MAPPING ---
+function toUuid(
+  id: string,
+  type:
+    | "workspace"
+    | "node"
+    | "edge"
+    | "source"
+    | "mission"
+    | "run"
+    | "artifact"
+    | "patch"
+    | "approval",
+): string {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(id)) {
+    return id.toLowerCase();
+  }
+
+  // Workspaces
+  if (
+    type === "workspace" &&
+    id.startsWith("m") &&
+    !isNaN(Number(id.substring(1)))
+  ) {
+    const num = id.substring(1);
+    return `00000000-0000-0000-0000-${num.padStart(12, "0")}`;
+  }
+
+  // Missions & Runs
+  if (
+    type === "mission" &&
+    id.startsWith("m") &&
+    !isNaN(Number(id.substring(1)))
+  ) {
+    const num = id.substring(1);
+    return `00000000-0000-0000-0001-${num.padStart(12, "0")}`;
+  }
+  if (type === "run" && id.startsWith("m") && !isNaN(Number(id.substring(1)))) {
+    const num = id.substring(1);
+    return `00000000-0000-0000-0002-${num.padStart(12, "0")}`;
+  }
+
+  // Scenario E (m5) nodes
+  if (
+    type === "node" &&
+    id.startsWith("ne") &&
+    !isNaN(Number(id.substring(2)))
+  ) {
+    const num = id.substring(2);
+    return `00000000-0000-0000-0000-100000000${num.padStart(3, "0")}`;
+  }
+
+  // Scenario F (m6) nodes
+  if (
+    type === "node" &&
+    id.startsWith("nf") &&
+    !isNaN(Number(id.substring(2)))
+  ) {
+    const num = id.substring(2);
+    return `00000000-0000-0000-0000-600000000${num.padStart(3, "0")}`;
+  }
+
+  // General deterministic hash mapping
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash |= 0;
+  }
+  const hex =
+    Math.abs(hash).toString(16).padStart(8, "0") +
+    Math.abs(hash * 33)
+      .toString(16)
+      .padStart(8, "0");
+  const hexPart = hex.substring(0, 12).padEnd(12, "0");
+
+  const typeMap = {
+    workspace: "0000",
+    node: "1000",
+    edge: "2000",
+    source: "3000",
+    mission: "4000",
+    run: "5000",
+    artifact: "6000",
+    patch: "7000",
+    approval: "8000",
+  };
+  const typePrefix = typeMap[type] || "9000";
+  return `00000000-0000-0000-${typePrefix}-${hexPart}`;
+}
+
 async function seed() {
-  console.log("🚀 Starting Master Synchronization of all data...");
+  console.log(
+    "🚀 Starting Master Synchronization of all seed data to PostgreSQL...",
+  );
 
-  // 1. Workspaces (A, B, C, D, E)
-  const workspaces = [
-    {
-      id: "m1",
-      title: "Scenario A: Climate Research",
-      goal: "Synthesize Arctic melt impact",
-    },
-    {
-      id: "m2",
-      title: "Scenario B: Crisis Response",
-      goal: "Suez Canal blockage mitigation",
-    },
-    {
-      id: "m3",
-      title: "Scenario C: AI Governance",
-      goal: "Finalize Human-in-the-loop policy",
-    },
-    {
-      id: "m4",
-      title: "Scenario D: Knowledge Synthesis",
-      goal: "Neural Architecture Search summary",
-    },
-    {
-      id: "m5",
-      title: "Scenario E: Neural Network Collapse",
-      goal: "Stress-test large-scale transformer stability",
-    },
-    {
-      id: "m6",
-      title: "Scenario F: ADR Review - Event Sourcing",
-      goal: "Review and finalize ADR for event-driven architecture",
-    },
-    {
-      id: "m7",
-      title: "Демо: Микросервисы (10 нод)",
-      goal: "Оценка архитектурных рисков при переходе на микросервисы",
-    },
-    {
-      id: "m8",
-      title: "Демо: Облачная миграция (20 нод)",
-      goal: "Синтез стратегии переноса legacy-систем в облако",
-    },
-    {
-      id: "m9",
-      title: "Демо: Система лояльности (50 нод)",
-      goal: "Глубокий анализ требований и противоречий новой системы",
-    },
-  ];
+  // --- 1. CLEANING OLD DATABASE DATA ---
+  console.log("🧹 Clearing legacy/outdated workspace data...");
+  await db.delete(schema.epistemicEdges);
+  await db.delete(schema.epistemicNodeEvidenceRefs);
+  await db.delete(schema.evidenceRefs);
+  await db.delete(schema.sourceChunks);
+  await db.delete(schema.sources);
+  await db.delete(schema.nodePatches);
+  await db.delete(schema.governanceProcesses);
+  await db.delete(schema.readinessAssessments);
+  await db.delete(schema.artifactPatchNodeRefs);
+  await db.delete(schema.artifactPatches);
+  await db.delete(schema.approvalRequests);
+  await db.delete(schema.conflictCards);
+  await db.delete(schema.decisionRecords);
+  await db.delete(schema.livingArtifacts);
+  await db.delete(schema.epistemicNodes);
+  await db.delete(schema.missionRuns);
+  await db.delete(schema.missions);
+  await db.delete(schema.userAssignments);
+  await db.delete(schema.orgPositions);
+  await db.delete(schema.orgUnits);
+  await db.delete(schema.identities);
+  await db.delete(schema.workspaces);
 
-  for (const ws of workspaces) {
-    const uuid = `00000000-0000-0000-0000-${ws.id.replace("m", "").padStart(12, "0")}`;
-    await db
-      .insert(schema.workspaces)
-      .values({
-        id: uuid,
-        title: ws.title,
-        status: "running",
-        mode: "assisted",
-        sensitivity: "internal",
-        goal: ws.goal,
-        createdByType: "user",
-        createdById: "admin",
-        brief: {
-          goal: ws.goal,
-          successCriteria: ["Map critical points", "Narrow decision scope"],
-          constraints: [],
-          unknowns: [],
-        },
-      })
-      .onConflictDoUpdate({
-        target: schema.workspaces.id,
-        set: { title: ws.title, goal: ws.goal },
-      });
-  }
+  // --- 2. RETRIEVE HIGH-FIDELITY MOCK DATA ---
+  const mock = createMockData();
+  console.log(
+    `Loaded ${mock.workspaces.length} workspaces, ${mock.nodes.length} nodes, ${mock.edges.length} edges from mock-data.ts`,
+  );
 
-  // 2. Scenario E: The Massive Graph (50 nodes)
-  const wsE_UUID = "00000000-0000-0000-0000-000000000005";
-  console.log("Generating Scenario E (50 nodes)...");
-
-  for (let i = 1; i <= 50; i++) {
-    const nodeId = `00000000-0000-0000-0000-100000000${i.toString().padStart(3, "0")}`;
-    const type =
-      i % 3 === 0 ? "hypothesis" : i % 2 === 0 ? "observation" : "claim";
-    const content = [
-      "Recursive depth instability detected in layer " + i,
-      "Gradient vanishing in cross-attention sub-block " + i,
-      "Entropy collapse observed at temperature T=" + (0.1 + i / 50).toFixed(2),
-      "Latent space fragmentation hypothesis #" + i,
-      "Empirical trace of neuron group " + i + " firing rate saturation",
-    ][i % 5];
-
-    await db
-      .insert(schema.epistemicNodes)
-      .values({
-        id: nodeId,
-        workspaceId: wsE_UUID,
-        type: type as "claim" | "hypothesis" | "observation" | "risk",
-        content,
-        strength: "moderate",
-        evidence: [],
-        metadata: { layer: i },
-      })
-      .onConflictDoUpdate({
-        target: schema.epistemicNodes.id,
-        set: { content },
-      });
-  }
-
-  // 3. Scenario E: Edges (Complex web)
-  for (let i = 1; i <= 50; i++) {
-    const sourceId = `00000000-0000-0000-0000-100000000${i.toString().padStart(3, "0")}`;
-    const targetIdx = (i + 1) % 50 || 1;
-    const targetId = `00000000-0000-0000-0000-100000000${targetIdx.toString().padStart(3, "0")}`;
-
-    await db
-      .insert(schema.epistemicEdges)
-      .values({
-        id: `00000000-0000-0000-0000-200000000${i.toString().padStart(3, "0")}`,
-        workspaceId: wsE_UUID,
-        sourceNodeId: sourceId,
-        targetNodeId: targetId,
-        type: (i % 2 === 0 ? "supports" : "contradicts") as
-          | "supports"
-          | "contradicts",
-        metadata: {},
-      })
-      .onConflictDoNothing();
-  }
-
-  // 4. Identities (Admin, Reviewer, Observer)
-  console.log("Seeding identities...");
-  const users = [
+  // --- 3. SEED IDENTITIES (USERS, ORG UNITS, POSITIONS, ASSIGNMENTS) ---
+  console.log("👤 Seeding system identities and assignments...");
+  await db.insert(schema.identities).values([
     {
       id: "admin-1",
       username: "admin",
-      email: "admin@epios.local",
+      email: "admin@epios.ai",
       role: "admin",
+      isActive: 1,
     },
     {
-      id: "reviewer-1",
-      username: "reviewer",
-      email: "reviewer@epios.local",
+      id: "architect-1",
+      username: "architect",
+      email: "arch@epios.ai",
       role: "reviewer",
+      isActive: 1,
+    },
+    {
+      id: "analyst-1",
+      username: "analyst",
+      email: "analyst@epios.ai",
+      role: "contributor",
+      isActive: 1,
     },
     {
       id: "observer-1",
       username: "observer",
-      email: "observer@epios.local",
+      email: "obs@epios.ai",
       role: "observer",
+      isActive: 1,
     },
-  ];
+    {
+      id: "viewer-1",
+      username: "viewer",
+      email: "viewer@epios.ai",
+      role: "viewer",
+      isActive: 1,
+    },
+    // compatibility with old tests and frontends:
+    {
+      id: "approver-1",
+      username: "approver",
+      email: "approver@epios.local",
+      role: "approver",
+      isActive: 1,
+    },
+    {
+      id: "contributor-1",
+      username: "contributor",
+      email: "contributor@epios.local",
+      role: "contributor",
+      isActive: 1,
+    },
+    // underscore commercial seed identities:
+    {
+      id: "admin_1",
+      username: "admin_1",
+      email: "admin_1@epios.corp",
+      role: "admin",
+      isActive: 1,
+    },
+    {
+      id: "owner_1",
+      username: "owner_1",
+      email: "owner_1@epios.corp",
+      role: "reviewer",
+      isActive: 1,
+    },
+    {
+      id: "reviewer_1",
+      username: "reviewer_1",
+      email: "reviewer_1@epios.corp",
+      role: "reviewer",
+      isActive: 1,
+    },
+    {
+      id: "contributor_1",
+      username: "contributor_1",
+      email: "contributor_1@epios.corp",
+      role: "contributor",
+      isActive: 1,
+    },
+    {
+      id: "observer_1",
+      username: "observer_1",
+      email: "observer_1@epios.corp",
+      role: "observer",
+      isActive: 1,
+    },
+  ]);
 
-  for (const user of users) {
-    await db
-      .insert(schema.identities)
-      .values({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        isActive: 1,
-      })
-      .onConflictDoUpdate({
-        target: schema.identities.id,
-        set: { role: user.role },
-      });
+  const unit1_UUID = "00000000-0000-0000-0000-010000000001";
+  const unit2_UUID = "00000000-0000-0000-0000-010000000002";
+  const unit3_UUID = "00000000-0000-0000-0000-010000000003";
+  const unitCorp1_UUID = "00000000-0000-0000-0000-010000000101";
+  const unitCorp2_UUID = "00000000-0000-0000-0000-010000000102";
+  const unitCorp3_UUID = "00000000-0000-0000-0000-010000000103";
+
+  await db.insert(schema.orgUnits).values([
+    { id: unit1_UUID, name: "Governance Group" },
+    { id: unit2_UUID, name: "Product Squad S7" },
+    { id: unit3_UUID, name: "Security Audit Team" },
+    { id: unitCorp1_UUID, name: "Corporate Governance" },
+    { id: unitCorp2_UUID, name: "Product Engineering" },
+    { id: unitCorp3_UUID, name: "Security & Audit" },
+  ]);
+
+  const pos1_UUID = "00000000-0000-0000-0000-020000000001";
+  const pos2_UUID = "00000000-0000-0000-0000-020000000002";
+  const pos3_UUID = "00000000-0000-0000-0000-020000000003";
+  const pos4_UUID = "00000000-0000-0000-0000-020000000004";
+  const posCorp1_UUID = "00000000-0000-0000-0000-020000000101";
+  const posCorp2_UUID = "00000000-0000-0000-0000-020000000102";
+  const posCorp3_UUID = "00000000-0000-0000-0000-020000000103";
+  const posCorp4_UUID = "00000000-0000-0000-0000-020000000104";
+
+  await db.insert(schema.orgPositions).values([
+    { id: pos1_UUID, name: "Principal Architect", level: 1 },
+    { id: pos2_UUID, name: "Technical Lead", level: 2 },
+    { id: pos3_UUID, name: "Security Officer", level: 2 },
+    { id: pos4_UUID, name: "Senior Analyst", level: 3 },
+    { id: posCorp1_UUID, name: "Chief Architect", level: 1 },
+    { id: posCorp2_UUID, name: "Senior Governance Officer", level: 2 },
+    { id: posCorp3_UUID, name: "Lead Developer", level: 2 },
+    { id: posCorp4_UUID, name: "Associate Analyst", level: 3 },
+  ]);
+
+  await db.insert(schema.userAssignments).values([
+    {
+      id: "00000000-0000-0000-0000-030000000001",
+      userId: "admin-1",
+      role: "owner",
+      unitId: unit1_UUID,
+      positionId: pos1_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000002",
+      userId: "architect-1",
+      role: "reviewer",
+      unitId: unit2_UUID,
+      positionId: pos2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000003",
+      userId: "approver-1",
+      role: "reviewer",
+      unitId: unit1_UUID,
+      positionId: pos1_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000004",
+      userId: "contributor-1",
+      role: "contributor",
+      unitId: unit2_UUID,
+      positionId: pos2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000005",
+      userId: "viewer-1",
+      role: "observer",
+      unitId: unit2_UUID,
+      positionId: pos4_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000006",
+      userId: "observer-1",
+      role: "observer",
+      unitId: unit2_UUID,
+      positionId: pos4_UUID,
+      isActive: true,
+    },
+    // Underscore assignments
+    {
+      id: "00000000-0000-0000-0000-030000000101",
+      userId: "admin_1",
+      role: "owner",
+      unitId: unitCorp1_UUID,
+      positionId: posCorp1_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000102",
+      userId: "owner_1",
+      role: "owner",
+      unitId: unitCorp1_UUID,
+      positionId: posCorp2_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000103",
+      userId: "reviewer_1",
+      role: "reviewer",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp3_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000104",
+      userId: "contributor_1",
+      role: "contributor",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp4_UUID,
+      isActive: true,
+    },
+    {
+      id: "00000000-0000-0000-0000-030000000105",
+      userId: "observer_1",
+      role: "observer",
+      unitId: unitCorp2_UUID,
+      positionId: posCorp4_UUID,
+      isActive: true,
+    },
+  ]);
+
+  // --- 4. SEED WORKSPACES, MISSIONS, AND RUNS ---
+  console.log("📂 Seeding workspaces and active mission run containers...");
+  for (const ws of mock.workspaces) {
+    const wsUuid = toUuid(ws.id, "workspace");
+    const missionUuid = toUuid(ws.id, "mission");
+    const runUuid = toUuid(ws.id, "run");
+
+    await db.insert(schema.workspaces).values({
+      id: wsUuid,
+      title: ws.title,
+      status: ws.status,
+      mode: ws.mode,
+      sensitivity: ws.sensitivity,
+      goal: ws.brief.goal,
+      context: ws.brief.context ?? null,
+      successCriteria: ws.brief.successCriteria,
+      constraints: ws.brief.constraints,
+      unknowns: ws.brief.unknowns,
+      desiredArtifactType: ws.desiredArtifactType ?? null,
+      createdByType: ws.createdBy.type,
+      createdById: ws.createdBy.id,
+      createdAt: ws.createdAt,
+      updatedAt: ws.updatedAt,
+      version: ws.version,
+    });
+
+    await db.insert(schema.missions).values({
+      id: missionUuid,
+      workspaceId: wsUuid,
+      title: "Primary Mission",
+      status: "active",
+      mode: ws.mode,
+      sensitivity: ws.sensitivity,
+      goal: ws.brief.goal,
+      successCriteria: ws.brief.successCriteria,
+      constraints: ws.brief.constraints,
+      unknowns: ws.brief.unknowns,
+      desiredArtifactType: ws.desiredArtifactType ?? null,
+      createdByType: "user",
+      createdById: ws.createdBy.id,
+    });
+
+    await db.insert(schema.missionRuns).values({
+      id: runUuid,
+      missionId: missionUuid,
+      status: "running",
+      startedByType: "user",
+      startedById: ws.createdBy.id,
+    });
   }
 
-  // 5. Sources for Scenario F
-  console.log("Seeding sources for Scenario F...");
-  const wsF_UUID = "00000000-0000-0000-0000-000000000006";
-  await db
-    .insert(schema.sources)
-    .values({
-      id: "00000000-0000-0000-0000-300000000001",
-      missionId: wsF_UUID,
-      type: "file",
-      content:
-        "Proposed decision to adopt Event Sourcing for all mission history.",
-      metadata: {
-        title: "Event Sourcing Draft ADR",
-        url: "fixtures/adr-review/event-sourcing-draft.md",
-        reliability: "unrated",
-        author: "architect",
-      },
-    })
-    .onConflictDoNothing();
-
-  // 6. Russian Demo Scenarios
-  console.log("Generating Russian Demo Scenarios...");
-
-  // Scenario 7 (10 nodes)
-  const ws7_UUID = "00000000-0000-0000-0000-000000000007";
-  const nodes7 = [
-    "Микросервисы повышают масштабируемость системы",
-    "Сложность отладки в распределенных системах увеличивается",
-    "Необходимость внедрения распределенной трассировки (Jaeger/Zipkin)",
-    "Выбор протокола: gRPC обеспечивает лучшую производительность чем REST",
-    "Использование Kafka для асинхронного взаимодействия сервисов",
-    "Риск рассогласованности данных (Eventual Consistency)",
-    "Паттерн Saga для управления распределенными транзакциями",
-    "Централизованное логирование (ELK Stack) критично для эксплуатации",
-    "Kubernetes как стандарт оркестрации контейнеров",
-    "Мониторинг через Prometheus и Grafana для контроля SLA",
-  ];
-  for (let i = 0; i < nodes7.length; i++) {
-    await db
-      .insert(schema.epistemicNodes)
-      .values({
-        id: `00000000-0000-0000-0000-700000000${i.toString().padStart(3, "0")}`,
-        workspaceId: ws7_UUID,
-        type: (i % 2 === 0 ? "claim" : "hypothesis") as
-          | "claim"
-          | "hypothesis"
-          | "observation"
-          | "risk",
-        content: nodes7[i],
-        strength: "moderate",
-      })
-      .onConflictDoUpdate({
-        target: schema.epistemicNodes.id,
-        set: { content: nodes7[i] },
-      });
+  // --- 5. SEED EPISTEMIC NODES ---
+  console.log("📌 Seeding high-fidelity epistemic nodes...");
+  for (const node of mock.nodes) {
+    await db.insert(schema.epistemicNodes).values({
+      id: toUuid(node.id, "node"),
+      workspaceId: toUuid(node.workspaceId, "workspace"),
+      missionId: toUuid(node.workspaceId, "mission"),
+      content: node.content,
+      type: node.type,
+      strength: node.strength,
+      createdAt: node.createdAt,
+      updatedAt: node.updatedAt,
+      version: node.version,
+      metadata: node.metadata || {},
+    });
   }
 
-  // Scenario 8 (20 nodes) - Hybrid Cloud Strategy
-  const ws8_UUID = "00000000-0000-0000-0000-000000000008";
-  for (let i = 0; i < 20; i++) {
-    const content =
-      [
-        "Облачные провайдеры снижают капитальные затраты (CAPEX)",
-        "Безопасность данных в публичном облаке вызывает опасения",
-        "Гибридное облако — оптимальный баланс для энтерпрайза",
-        "Задержка сети (Latency) между on-prem и облаком",
-        "Автоматическое масштабирование (Auto-scaling) экономит ресурсы",
-        "Vendor lock-in: сложность миграции между провайдерами",
-        "Terraform для управления инфраструктурой как кодом (IaC)",
-        "Облачные базы данных (Managed SQL) упрощают администрирование",
-        "Стоимость исходящего трафика (Egress) может быть высокой",
-        "Serverless (Lambda/Cloud Functions) для событийных задач",
-      ][i % 10] + ` (Аргумент #${i + 1})`;
-
-    await db
-      .insert(schema.epistemicNodes)
-      .values({
-        id: `00000000-0000-0000-0000-800000000${i.toString().padStart(3, "0")}`,
-        workspaceId: ws8_UUID,
-        type: (i % 4 === 0 ? "risk" : "claim") as
-          | "claim"
-          | "hypothesis"
-          | "observation"
-          | "risk",
-        content,
-        strength: "moderate",
-      })
-      .onConflictDoUpdate({
-        target: schema.epistemicNodes.id,
-        set: { content },
-      });
+  // --- 6. SEED EPISTEMIC EDGES ---
+  console.log("🔗 Seeding semantic edges...");
+  for (const edge of mock.edges) {
+    await db.insert(schema.epistemicEdges).values({
+      id: toUuid(edge.id, "edge"),
+      workspaceId: toUuid(edge.workspaceId, "workspace"),
+      sourceNodeId: toUuid(edge.sourceNodeId, "node"),
+      targetNodeId: toUuid(edge.targetNodeId, "node"),
+      type: edge.type,
+      metadata: edge.metadata || {},
+      createdAt: edge.createdAt,
+    });
   }
 
-  // Scenario 9 (50 nodes) - Loyalty System
-  const ws9_UUID = "00000000-0000-0000-0000-000000000009";
-  for (let i = 0; i < 50; i++) {
-    const content =
-      [
-        "Бонусные баллы должны сгорать через 12 месяцев",
-        "Интеграция с кассовым ПО (POS) — критическая точка отказа",
-        "Мобильное приложение как основной канал взаимодействия",
-        "Персонализация предложений на основе ML-моделей",
-        "Риск фрода (мошенничества) с начислением баллов",
-        "Высокая нагрузка в периоды распродаж (Черная пятница)",
-        "Соответствие ФЗ-152 о персональных данных",
-        "Омниканальность: единый баланс в онлайне и офлайне",
-        "A/B тесты механик лояльности для повышения конверсии",
-        "Партнерская сеть: возможность тратить баллы у партнеров",
-      ][i % 10] + ` (Деталь #${i + 1})`;
-
-    await db
-      .insert(schema.epistemicNodes)
-      .values({
-        id: `00000000-0000-0000-0000-900000000${i.toString().padStart(3, "0")}`,
-        workspaceId: ws9_UUID,
-        type: (i % 5 === 0 ? "observation" : "claim") as
-          | "claim"
-          | "hypothesis"
-          | "observation"
-          | "risk",
-        content,
-        strength: "strong",
-      })
-      .onConflictDoUpdate({
-        target: schema.epistemicNodes.id,
-        set: { content },
-      });
+  // --- 7. SEED SOURCES ---
+  console.log("🗂️ Seeding empirical sources...");
+  for (const src of mock.sources || []) {
+    await db.insert(schema.sources).values({
+      id: toUuid(src.id, "source"),
+      workspaceId: toUuid(src.workspaceId, "workspace"),
+      missionId: toUuid(src.workspaceId, "mission"),
+      sourceType: src.sourceType,
+      title: src.title,
+      uri: src.metadata?.url || null,
+      sourceQuality: src.sourceQuality || "high",
+      createdAt: src.createdAt,
+    });
   }
 
-  // Edges for Russian Scenarios
-  console.log("Generating edges for Russian Demo Scenarios...");
+  // --- 8. SEED SPECIFIC SCENARIO F (ADR REVIEW) WORKFLOW ITEMS ---
+  console.log("⚡ Seeding Scenario F (ADR Review) patches and approvals...");
+  const wsF_UUID = toUuid("m6", "workspace");
+  const missionF_UUID = toUuid("m6", "mission");
+  const runF_UUID = toUuid("m6", "run");
 
-  // Edges for WS7 (10 nodes) - simple chain and some branches
-  for (let i = 0; i < 9; i++) {
-    await db
-      .insert(schema.epistemicEdges)
-      .values({
-        id: `00000000-0000-0000-0000-700000001${i.toString().padStart(3, "0")}`,
-        workspaceId: ws7_UUID,
-        sourceNodeId: `00000000-0000-0000-0000-700000000${i.toString().padStart(3, "0")}`,
-        targetNodeId: `00000000-0000-0000-0000-700000000${(i + 1).toString().padStart(3, "0")}`,
-        type: (i % 3 === 0 ? "contradicts" : "supports") as
-          | "supports"
-          | "contradicts",
-      })
-      .onConflictDoNothing();
-  }
+  // Living Artifact
+  const artifactId = "00000000-0000-0000-0000-500000000001";
+  await db.insert(schema.livingArtifacts).values({
+    id: artifactId,
+    missionId: missionF_UUID,
+    artifactType: "ADR",
+    title: "Event Sourcing Strategy",
+    status: "draft",
+    currentVersion: 1,
+  });
 
-  // Edges for WS8 (20 nodes) - star topology or mixed
-  for (let i = 1; i < 20; i++) {
-    await db
-      .insert(schema.epistemicEdges)
-      .values({
-        id: `00000000-0000-0000-0000-800000001${i.toString().padStart(3, "0")}`,
-        workspaceId: ws8_UUID,
-        sourceNodeId: `00000000-0000-0000-0000-800000000${i.toString().padStart(3, "0")}`,
-        targetNodeId: `00000000-0000-0000-0000-800000000000`, // All connect back to the first node
-        type: (i % 2 === 0 ? "supports" : "contradicts") as
-          | "supports"
-          | "contradicts",
-      })
-      .onConflictDoNothing();
-  }
+  // Patch
+  const patchId = "00000000-0000-0000-0000-600000002001";
+  await db.insert(schema.artifactPatches).values({
+    id: patchId,
+    artifactId: artifactId,
+    missionId: missionF_UUID,
+    baseVersion: 1,
+    diff: "Add Snapshotting pattern to mitigate complexity",
+    reason: "Addressing complexity risks",
+    riskClass: "medium",
+    status: "proposed",
+    authorType: "user",
+    authorId: "contributor-1",
+  });
 
-  // Edges for WS9 (50 nodes) - more complex web
-  for (let i = 0; i < 50; i++) {
-    const targetIdx = (i + 5) % 50;
-    await db
-      .insert(schema.epistemicEdges)
-      .values({
-        id: `00000000-0000-0000-0000-900000001${i.toString().padStart(3, "0")}`,
-        workspaceId: ws9_UUID,
-        sourceNodeId: `00000000-0000-0000-0000-900000000${i.toString().padStart(3, "0")}`,
-        targetNodeId: `00000000-0000-0000-0000-900000000${targetIdx.toString().padStart(3, "0")}`,
-        type: (i % 3 === 0 ? "contradicts" : "supports") as
-          | "supports"
-          | "contradicts",
-      })
-      .onConflictDoNothing();
-  }
+  // Approval Request
+  await db.insert(schema.approvalRequests).values({
+    id: "00000000-0000-0000-0000-600000003001",
+    missionId: missionF_UUID,
+    runId: runF_UUID,
+    subjectType: "artifact_patch",
+    subjectRef: patchId,
+    preview: { title: "Patch Review" },
+    riskClass: "medium",
+    status: "pending",
+    idempotencyKey: "seed-patch-1",
+  });
 
-  console.log("✅ MASTER SYNC COMPLETED!");
-  process.exit(0);
+  console.log(
+    "✅ Database successfully synchronized with the high-fidelity mock datasets!",
+  );
 }
 
-seed().catch((err) => {
-  console.error("❌ Sync failed:", err);
-  process.exit(1);
-});
+seed()
+  .catch((err) => {
+    console.error("❌ Seed failed:", err);
+    process.exit(1);
+  })
+  .finally(() => queryClient.end());
