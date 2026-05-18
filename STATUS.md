@@ -29,11 +29,11 @@ Current priority is implementing ADR Review Workflow MVP with full contract comp
 
 ## 🚀 Roadmap: v1.1 ADR Review (Upcoming Sprints)
 
-### Sprint DOC-AUDIT: Documentation Hardening (In Progress)
-- [ ] Fix broken ADR links
-- [ ] Complete DOCUMENT_REGISTER.md
-- [ ] Update docs/README.md structure
-- [ ] Validate all governance contracts
+### Sprint DOC-AUDIT: Documentation Hardening (Completed ✅)
+- [x] Fix broken ADR links
+- [x] Complete DOCUMENT_REGISTER.md
+- [x] Update docs/README.md structure
+- [x] Validate all governance contracts
 
 ### Sprint S5-S8: ADR Review UI Foundation (Planned)
 - [ ] ADR Review workspace shell
