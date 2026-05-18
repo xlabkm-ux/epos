@@ -18,7 +18,7 @@ export async function setupTestContainer() {
     .withPassword("postgres")
     .start();
 
-  const connectionString = container.getConnectionString();
+  const connectionString = container.getConnectionUri();
   const sql = postgres(connectionString, { max: 1 });
   const db = drizzle(sql);
 
