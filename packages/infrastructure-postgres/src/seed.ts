@@ -448,7 +448,7 @@ async function seed() {
   // --- 7. SEED SOURCES ---
   console.log("🗂️ Seeding empirical sources...");
   for (const src of mock.sources || []) {
-    await db.insert(schema.sources).values({
+    await db.insert(schema.sources).values([{
       id: toUuid(src.id, "source"),
       workspaceId: toUuid(src.workspaceId, "workspace"),
       missionId: toUuid(src.workspaceId, "mission"),
@@ -457,7 +457,7 @@ async function seed() {
       uri: src.metadata?.url || null,
       sourceQuality: src.sourceQuality || "high",
       createdAt: src.createdAt,
-    });
+    }]);
   }
 
   // --- 8. SEED SPECIFIC SCENARIO F (ADR REVIEW) WORKFLOW ITEMS ---
