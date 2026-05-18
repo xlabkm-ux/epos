@@ -448,13 +448,14 @@ async function seed() {
   // --- 7. SEED SOURCES ---
   console.log("🗂️ Seeding empirical sources...");
   for (const src of mock.sources || []) {
+    const uriValue = src.metadata?.url;
     await db.insert(schema.sources).values([{
       id: toUuid(src.id, "source"),
       workspaceId: toUuid(src.workspaceId, "workspace"),
       missionId: toUuid(src.workspaceId, "mission"),
       sourceType: src.sourceType,
       title: src.title,
-      uri: src.metadata?.url || null,
+      uri: typeof uriValue === 'string' ? uriValue : null,
       sourceQuality: (src.sourceQuality as string) || "high",
       createdAt: src.createdAt,
     }]);
