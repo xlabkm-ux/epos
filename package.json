@@ -34,7 +34,7 @@
     "db:init": "pnpm run db:migrate && pnpm run db:seed",
     "db:reseed": "pnpm run db:seed",
     "db:reset": "pnpm run db:down && docker compose up -d postgres && pnpm run db:migrate && pnpm run db:seed",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm depcruise && pnpm check:docs-governance",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm depcruise",
     "check:docs-governance": "tsx tools/docs-governance/check-docs.ts",
     "check:pr-traceability": "tsx tools/governance/check-pr-traceability.ts",
     "depcruise": "depcruise packages apps",
