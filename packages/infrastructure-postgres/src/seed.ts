@@ -455,7 +455,7 @@ async function seed() {
       sourceType: src.sourceType,
       title: src.title,
       uri: src.metadata?.url || null,
-      sourceQuality: src.sourceQuality || "high",
+      sourceQuality: (src.sourceQuality as string) || "high",
       createdAt: src.createdAt,
     }]);
   }
