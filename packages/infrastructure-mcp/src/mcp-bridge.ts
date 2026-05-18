@@ -1,5 +1,6 @@
 import { MCPBridgePort, MCPAppRegistryPort } from "@epios/ports";
-import { ExecuteToolSchema } from "./schemas.js";
+import { SecurityError } from "@epios/domain";
+import { ExecuteToolSchema, CallResourceSchema, GetAppMetadataSchema } from "./schemas.js";
 
 /**
  * Hardened MCP Bridge implementation.
@@ -16,14 +17,23 @@ export class MockMCPBridge implements MCPBridgePort {
     // Directive 5.2: Strict validation of tool execution arguments
     const validation = ExecuteToolSchema.safeParse({ appId, toolName, args });
     if (!validation.success) {
-      throw new Error(
+      throw new SecurityError(
         `Invalid MCP execution request: ${validation.error.message}`,
+        "E_INVALID_PROTOCOL",
       );
     }
 
     const app = await this.registry.getApp(appId);
     if (!app) {
       throw new Error(`MCP Application ${appId} not found`);
+    }
+
+    // T-SEC-03: Capability Enforcement
+    if (toolName.startsWith("domain:admin") && !app.capabilities.includes("admin")) {
+      throw new SecurityError(
+        `App ${appId} lacks required capability for ${toolName}`,
+        "E_UNAUTHORIZED",
+      );
     }
 
     // Mock execution logic
@@ -44,6 +54,14 @@ export class MockMCPBridge implements MCPBridgePort {
   }
 
   async callResource(appId: string, resourceUri: string): Promise<unknown> {
+    const validation = CallResourceSchema.safeParse({ appId, resourceUri });
+    if (!validation.success) {
+      throw new SecurityError(
+        `Invalid CallResource request: ${validation.error.message}`,
+        "E_INVALID_PROTOCOL",
+      );
+    }
+
     const app = await this.registry.getApp(appId);
     if (!app) {
       throw new Error(`MCP Application ${appId} not found`);
@@ -53,6 +71,14 @@ export class MockMCPBridge implements MCPBridgePort {
   }
 
   async getAppMetadata(appId: string): Promise<unknown> {
+    const validation = GetAppMetadataSchema.safeParse({ appId });
+    if (!validation.success) {
+      throw new SecurityError(
+        `Invalid GetAppMetadata request: ${validation.error.message}`,
+        "E_INVALID_PROTOCOL",
+      );
+    }
+
     const app = await this.registry.getApp(appId);
     if (!app) {
       throw new Error(`MCP Application ${appId} not found`);

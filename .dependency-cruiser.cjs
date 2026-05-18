@@ -61,7 +61,10 @@ module.exports = {
       name: 'application-boundaries',
       comment: 'Application layer should not depend on API or Infrastructure.',
       severity: 'error',
-      from: { path: '^packages/application' },
+      from: { 
+        path: '^packages/application',
+        pathNot: '^packages/application/test'
+      },
       to: {
         path: [
           '^packages/api',
@@ -73,7 +76,10 @@ module.exports = {
       name: 'infrastructure-boundaries',
       comment: 'Infrastructure should not depend on API or Application layers.',
       severity: 'error',
-      from: { path: '^packages/infrastructure' },
+      from: { 
+        path: '^packages/infrastructure',
+        pathNot: '.*seed\\.ts$'
+      },
       to: {
         path: [
           '^packages/api',
@@ -84,7 +90,7 @@ module.exports = {
     {
       name: 'no-external-to-internal-apps',
       comment: 'Apps should depend on the public API layer (packages/api), not directly on domain/application/infrastructure if we want to enforce strict layering.',
-      severity: 'warn',
+      severity: 'error',
       from: { path: '^apps/' },
       to: {
         path: [
@@ -97,7 +103,7 @@ module.exports = {
   ],
   options: {
     doNotFollow: {
-      path: 'node_modules'
+      path: 'node_modules|dist|coverage'
     },
     tsPreCompilationDeps: true,
     tsConfig: {

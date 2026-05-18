@@ -2,8 +2,8 @@
 
 **Project:** Epistemic OS v1.0  
 **Document ID:** `EPIOS-04-REPOSITORY-ENGINEERING-PROCESS`  
-**Version:** Draft 0.1  
-**Status:** Accepted_contract for MVP Bootstrap  
+**Version:** 0.2-BETA
+**Status:** accepted_contract
 **Depends on:** `EPIOS-00`, `EPIOS-01`, `EPIOS-02`, `EPIOS-03`  
 **Repository model:** Open-source from day one  
 **Target MVP horizon:** 6 weeks or faster  
@@ -29,7 +29,8 @@ It specifies:
 - release tags;
 - DORA delivery metrics;
 - security disclosure process;
-- documentation lifecycle.
+- documentation lifecycle;
+- development model (Spiral/Sprints).
 
 The goal is to avoid the document drift, unclear ownership and RC scope confusion that occurred in the predecessor project.
 
@@ -115,7 +116,7 @@ Recommended MVP workspace:
 ```text
 epistemic-os/
   apps/
-    demo-shell/
+    work-shell/
 
   packages/
     domain/
@@ -156,14 +157,14 @@ epistemic-os/
 | `infrastructure-runtime` | lightweight runner, future Temporal adapter boundary |
 | `observability` | trace schema, local logger, OTel-ready adapter |
 | `testing` | fixtures, contract tests, fake ports, seed data |
-| `demo-shell` | neutral Mission Room UI and MCP App host integration |
+| `work-shell` | neutral Mission Room UI and MCP App host integration |
 
 ### 4.2. Dependency Direction
 
 Allowed dependency direction:
 
 ```text
-domain ← ports ← application ← api ← demo-shell
+domain ← ports ← application ← api ← work-shell
 ports ← infrastructure-*
 ```
 
@@ -172,16 +173,29 @@ Prohibited:
 ```text
 domain → infrastructure
 application → provider SDK directly
-demo-shell → database repositories directly
+work-shell → database repositories directly
 MCP App → domain mutation directly
-infrastructure-postgres → demo-shell
+infrastructure-postgres → work-shell
 ```
 
 A dependency check should be added to CI by Week 2 or earlier.
 
 ---
 
-## 5. Package Manager and Tooling
+## 5. Development Model: The Spiral (Beta Version)
+
+Epistemic OS has transitioned from the initial mockup/demo stage to a **functioning Beta version**. The engineering process now follows a **Spiral Model**, moving from the core domain to the periphery through iterative sprints.
+
+### 5.1. Spiral Principles (Center to Periphery)
+1.  **Core Domain (Center):** Every feature must first be anchored in the `domain` invariants.
+2.  **Infrastructure Expansion:** The spiral expands by building out the necessary `ports` and `infrastructure` adapters.
+3.  **Peripheral UI & Services:** UI components and external service integrations are the outer layers of the spiral, providing the interface to the functioning core.
+4.  **Risk-Driven Iteration:** Each loop of the spiral (Sprint) starts with a review of architectural risks and ends with a functional increment.
+
+### 5.2. Sprint-Based Delivery
+- **Iterative Sprints:** Development is organized into sprints with clear, measurable goals.
+- **Beta Readiness:** Each sprint increment must maintain system stability and architectural integrity.
+- **Continuous Feedback:** The functioning Beta is used to gather real-time feedback, influencing the next loop of the spiral.
 
 Recommended package manager:
 
@@ -398,7 +412,7 @@ area:domain
 area:application
 area:postgres
 area:api
-area:demo-shell
+area:work-shell
 area:mcp
 area:runtime
 area:evidence
@@ -627,7 +641,7 @@ Initial ownership model:
 /packages/infrastructure-postgres/ @backend-owner @data-owner
 /packages/infrastructure-mcp/      @security-owner @frontend-owner
 /packages/api/                    @backend-owner
-/apps/demo-shell/                 @frontend-owner @product-owner
+/apps/work-shell/                 @frontend-owner @product-owner
 /docs/01_architecture/            @architect
 /docs/02_adrs/                    @architect
 /docs/03_specs/                   @architect @backend-owner

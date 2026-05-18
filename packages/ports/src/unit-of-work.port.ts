@@ -2,10 +2,21 @@ import { GraphRepositoryPort } from "./graph.repository.port.js";
 import { GovernanceRepositoryPort } from "./governance.port.js";
 import {
   WorkspaceRepositoryPort,
-  SourceRepositoryPort,
   RatingRepositoryPort,
+  SourceRepositoryPort,
+  MappingRepositoryPort,
 } from "./domain.repository.port.js";
 import { OutboxRepositoryPort } from "./outbox.repository.port.js";
+import {
+  MissionRepositoryPort,
+  MissionRunRepositoryPort,
+} from "./mission.repository.port.js";
+import { EvidenceRepositoryPort } from "./evidence.repository.port.js";
+import { ArtifactRepositoryPort } from "./artifact.repository.port.js";
+import {
+  DecisionRepositoryPort,
+  ApprovalRepositoryPort,
+} from "./decision.repository.port.js";
 
 /**
  * UnitOfWork provides access to all repositories within a single transaction scope.
@@ -14,8 +25,15 @@ export interface UnitOfWork {
   graphRepository: GraphRepositoryPort;
   governanceRepository: GovernanceRepositoryPort;
   workspaceRepository: WorkspaceRepositoryPort;
+  missionRepository: MissionRepositoryPort;
+  missionRunRepository: MissionRunRepositoryPort;
   sourceRepository: SourceRepositoryPort;
+  evidenceRepository: EvidenceRepositoryPort;
   ratingRepository: RatingRepositoryPort;
+  artifactRepository: ArtifactRepositoryPort;
+  decisionRepository: DecisionRepositoryPort;
+  approvalRepository: ApprovalRepositoryPort;
+  mappingRepository: MappingRepositoryPort;
   outboxRepository: OutboxRepositoryPort;
 }
 

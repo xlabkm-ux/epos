@@ -27,6 +27,17 @@ export const ExecuteToolSchema = z.object({
   args: z.record(z.string(), z.unknown()),
 });
 
+export const CallResourceSchema = z.object({
+  appId: z.string().min(1),
+  resourceUri: z.string().url(),
+});
+
+export const GetAppMetadataSchema = z.object({
+  appId: z.string().min(1),
+});
+
 export type McpRequest = z.infer<typeof McpRequestSchema>;
 export type McpResponse = z.infer<typeof McpResponseSchema>;
 export type ExecuteTool = z.infer<typeof ExecuteToolSchema>;
+export type CallResource = z.infer<typeof CallResourceSchema>;
+export type GetAppMetadata = z.infer<typeof GetAppMetadataSchema>;

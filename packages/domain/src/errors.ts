@@ -25,3 +25,10 @@ export class ConcurrencyError extends DomainError {
     this.name = "ConcurrencyError";
   }
 }
+
+export class SecurityError extends DomainError {
+  constructor(message: string, public code: string = "E_SECURITY_VIOLATION") {
+    super(message);
+    this.name = "SecurityError";
+  }
+}

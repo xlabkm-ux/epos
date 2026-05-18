@@ -8,8 +8,16 @@ import {
   GetReadinessUseCase,
   ApplyPatchUseCase,
   GetTraceUseCase,
+  ProposeArtifactPatchUseCase,
+  ResolveApprovalUseCase,
+  ApplyArtifactPatchUseCase,
+  GenerateFinalADRUseCase,
+  GetTraceSummaryUseCase,
+  ListArtifactPatchesUseCase,
+  ListApprovalsUseCase,
 } from "@epios/application";
 import { SecurityPort } from "@epios/ports";
+import { ActorRef } from "@epios/domain";
 
 export async function governanceRoutes(
   fastify: FastifyInstance,
@@ -22,6 +30,13 @@ export async function governanceRoutes(
     getReadinessUseCase: GetReadinessUseCase;
     applyPatchUseCase: ApplyPatchUseCase;
     getTraceUseCase: GetTraceUseCase;
+    proposeArtifactPatchUseCase: ProposeArtifactPatchUseCase;
+    resolveApprovalUseCase: ResolveApprovalUseCase;
+    applyArtifactPatchUseCase: ApplyArtifactPatchUseCase;
+    generateFinalADRUseCase: GenerateFinalADRUseCase;
+    getTraceSummaryUseCase: GetTraceSummaryUseCase;
+    listArtifactPatchesUseCase: ListArtifactPatchesUseCase;
+    listApprovalsUseCase: ListApprovalsUseCase;
     security: SecurityPort;
   },
 ) {
@@ -46,9 +61,10 @@ export async function governanceRoutes(
       schema: {
         body: {
           type: "object",
-          required: ["workspaceId", "content"],
+          required: ["workspaceId", "missionId", "content"],
           properties: {
             workspaceId: { type: "string" },
+            missionId: { type: "string" },
             content: { type: "string" },
             requiredVotes: { type: "number" },
           },
@@ -60,6 +76,7 @@ export async function governanceRoutes(
       const claim = await options.submitClaimUseCase.execute(
         request.body as {
           workspaceId: string;
+          missionId: string;
           content: string;
           requiredVotes?: number;
         },
@@ -121,5 +138,106 @@ export async function governanceRoutes(
     const { workspaceId } = request.query as { workspaceId: string };
     const trace = await options.getTraceUseCase.execute(workspaceId);
     return reply.status(200).send(trace);
+  });
+
+  fastify.get("/governance/trace-summary", async (request, reply) => {
+    const { workspaceId } = request.query as { workspaceId: string };
+    const summary = await options.getTraceSummaryUseCase.execute(workspaceId);
+    return reply.status(200).send(summary);
+  });
+
+  fastify.post("/governance/generate-adr", async (request, reply) => {
+    const { workspaceId } = request.body as { workspaceId: string };
+    const adr = await options.generateFinalADRUseCase.execute({ workspaceId });
+    return reply.status(200).send(adr);
+  });
+
+  // Artifact Patching
+  fastify.post("/governance/artifact-patches", async (request, reply) => {
+    await checkRole(["admin", "reviewer"]);
+    const result = await options.proposeArtifactPatchUseCase.execute(
+      request.body as {
+        artifactId: string;
+        missionId: string;
+        runId: string;
+        diff: string;
+        reason: string;
+        nodeRefs: string[];
+        evidenceRefs: string[];
+        decisionRefs: string[];
+        riskClass: "low" | "medium" | "high" | "critical";
+        author: ActorRef;
+        idempotencyKey?: string;
+      },
+    );
+    return reply.status(201).send(result);
+  });
+
+  fastify.post(
+    "/governance/approvals/:approvalId/resolve",
+    async (request, reply) => {
+      await checkRole(["admin", "reviewer"]);
+      const { approvalId } = request.params as { approvalId: string };
+      const result = await options.resolveApprovalUseCase.execute({
+        ...(request.body as {
+          decision: "approved" | "rejected";
+          rationale?: string;
+          actor: ActorRef;
+        }),
+        approvalId,
+      });
+      return reply.status(200).send(result);
+    },
+  );
+
+  fastify.post(
+    "/governance/artifact-patches/:patchId/apply",
+    async (request, reply) => {
+      await checkRole(["admin"]);
+      const { patchId } = request.params as { patchId: string };
+      const result = await options.applyArtifactPatchUseCase.execute({
+        ...(request.body as { actor: ActorRef }),
+        patchId,
+      });
+      return reply.status(200).send(result);
+    },
+  );
+
+  fastify.get("/governance/artifact-patches", async (request, reply) => {
+    const { artifactId, missionId } = request.query as {
+      artifactId?: string;
+      missionId?: string;
+    };
+    const patches = await options.listArtifactPatchesUseCase.execute({
+      artifactId,
+      missionId,
+    });
+    return reply.status(200).send(patches);
+  });
+
+  fastify.get("/governance/approvals", async (request, reply) => {
+    const { missionId, workspaceId, onlyPending } = request.query as {
+      missionId?: string;
+      workspaceId?: string;
+      onlyPending?: string;
+    };
+
+    let resolvedMissionId = missionId;
+    if (!resolvedMissionId && workspaceId) {
+      // For Demo/Pilot compatibility: assume mission ID follows the seed pattern 
+      // or we should fetch it from DB. For now, let's just use the seed pattern 
+      // where mission ID starts with 0001-... instead of 0000-...
+      resolvedMissionId = workspaceId.replace(/^00000000-0000-0000-0000-/, "00000000-0000-0000-0001-");
+    }
+
+    if (!resolvedMissionId) {
+      return reply.status(200).send([]);
+    }
+
+    const approvals = await options.listApprovalsUseCase.execute({
+      missionId: resolvedMissionId,
+      onlyPending: onlyPending === "true",
+    });
+    return reply.status(200).send(approvals);
   });
 }

@@ -12,7 +12,8 @@ export class PostgresRatingRepository implements RatingRepositoryPort {
       .insert(ratings)
       .values({
         id: rating.id,
-        nodeId: rating.nodeId,
+        subjectId: rating.subjectId,
+        subjectType: rating.subjectType,
         actorId: rating.actorId,
         value: rating.value,
         comment: rating.comment ?? null,
@@ -27,11 +28,11 @@ export class PostgresRatingRepository implements RatingRepositoryPort {
       });
   }
 
-  async findByNodeId(nodeId: string): Promise<Rating[]> {
+  async findBySubjectId(subjectId: string): Promise<Rating[]> {
     const records = await this.db
       .select()
       .from(ratings)
-      .where(eq(ratings.nodeId, nodeId));
+      .where(eq(ratings.subjectId, subjectId));
 
     return records.map((record) => this.mapToDomain(record));
   }
@@ -39,7 +40,8 @@ export class PostgresRatingRepository implements RatingRepositoryPort {
   private mapToDomain(record: typeof ratings.$inferSelect): Rating {
     return {
       id: record.id,
-      nodeId: record.nodeId,
+      subjectId: record.subjectId,
+      subjectType: record.subjectType as "node" | "source",
       actorId: record.actorId,
       value: record.value as EpistemicRatingValue,
       comment: record.comment ?? undefined,

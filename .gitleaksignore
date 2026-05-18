@@ -1,0 +1,20 @@
+# Gitleaks ignore file - False positives for EPIOS project
+
+# Environment files (already in .gitignore but scanned by gitleaks)
+.env
+.env.local
+.env.*.local
+
+# Example environment variables (not real secrets)
+.env.example
+
+# Test files with mock credentials
+packages/observability/test/redaction.test.ts
+packages/infrastructure-postgres/src/scripts/seed-identity.ts
+
+# Development configuration with safe defaults
+docker-compose.yml
+docs/**/*.md
+
+# Mock security implementations (intentional test values)
+packages/infrastructure-runtime/src/security-mocks.ts

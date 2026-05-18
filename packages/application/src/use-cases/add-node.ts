@@ -10,11 +10,13 @@ import { randomUUID } from "crypto";
 
 export type AddNodeRequest = {
   workspaceId: string;
+  missionId: string;
   type: NodeType;
   content: string;
   strength?: NodeStrength;
-  evidence?: EvidenceRef[];
+  // evidence?: EvidenceRef[]; // TODO: Evidence is now handled via EvidenceSet
   metadata?: Record<string, unknown>;
+  createdById?: string;
 };
 
 export class AddNodeUseCase {
@@ -32,14 +34,15 @@ export class AddNodeUseCase {
     const node = new EpistemicNode({
       id: randomUUID(),
       workspaceId: request.workspaceId,
+      missionId: request.missionId,
       type: request.type,
       content: request.content,
       strength: request.strength ?? "none",
-      evidence: request.evidence ?? [],
       metadata: request.metadata ?? {},
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdById: request.createdById ?? "admin-1",
     });
 
     await this.graphRepo.saveNode(node);

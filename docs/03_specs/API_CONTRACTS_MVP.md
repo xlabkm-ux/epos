@@ -16,6 +16,9 @@ Status: accepted_concept
 - **Idempotency**: `X-Idempotency-Key` (UUID v4) required for all state-changing requests.
 - **Traceability**: `X-Trace-ID` and `X-Actor-ID` headers recommended.
 
+> [!IMPORTANT]
+> **API Separation Rule:** This document contains ONLY the generic v1.0 MVP API contracts (e.g., `CreateMission`, `UpdateMissionBrief`, `IngestSource`, `StartRun`, `ResolveApproval`). Any ADR-specific routes or read models must be specified in `ADR_REVIEW_API_EXTENSION_CONTRACT.md`.
+
 ## 2. Resource Schemas (Zod-ready)
 
 ### MissionReadModel

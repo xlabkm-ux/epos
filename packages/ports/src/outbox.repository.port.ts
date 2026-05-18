@@ -1,5 +1,7 @@
 export interface OutboxMessage {
   id: string;
+  aggregateType: string;
+  aggregateId: string;
   type: string;
   payload: Record<string, unknown>;
   status: "pending" | "processed" | "failed";

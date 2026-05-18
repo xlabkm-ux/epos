@@ -7,6 +7,13 @@ import {
   SourceRepositoryPort,
   RatingRepositoryPort,
   OutboxRepositoryPort,
+  MissionRepositoryPort,
+  MissionRunRepositoryPort,
+  EvidenceRepositoryPort,
+  ArtifactRepositoryPort,
+  DecisionRepositoryPort,
+  ApprovalRepositoryPort,
+  MappingRepositoryPort,
 } from "@epios/ports";
 
 /**
@@ -21,6 +28,13 @@ export class InMemoryUnitOfWork implements UnitOfWork {
     public readonly sourceRepository: SourceRepositoryPort,
     public readonly ratingRepository: RatingRepositoryPort,
     public readonly outboxRepository: OutboxRepositoryPort,
+    public readonly missionRepository: MissionRepositoryPort,
+    public readonly missionRunRepository: MissionRunRepositoryPort,
+    public readonly evidenceRepository: EvidenceRepositoryPort,
+    public readonly artifactRepository: ArtifactRepositoryPort,
+    public readonly decisionRepository: DecisionRepositoryPort,
+    public readonly approvalRepository: ApprovalRepositoryPort,
+    public readonly mappingRepository: MappingRepositoryPort,
   ) {}
 }
 
@@ -35,6 +49,13 @@ export class InMemoryUnitOfWorkProvider implements UnitOfWorkPort {
     private readonly sourceRepo: SourceRepositoryPort,
     private readonly ratingRepo: RatingRepositoryPort,
     private readonly outboxRepo: OutboxRepositoryPort,
+    private readonly missionRepo: MissionRepositoryPort,
+    private readonly missionRunRepo: MissionRunRepositoryPort,
+    private readonly evidenceRepo: EvidenceRepositoryPort,
+    private readonly artifactRepo: ArtifactRepositoryPort,
+    private readonly decisionRepo: DecisionRepositoryPort,
+    private readonly approvalRepo: ApprovalRepositoryPort,
+    private readonly mappingRepo: MappingRepositoryPort,
   ) {}
 
   async runInTransaction<T>(work: (uow: UnitOfWork) => Promise<T>): Promise<T> {
@@ -45,6 +66,13 @@ export class InMemoryUnitOfWorkProvider implements UnitOfWorkPort {
       this.sourceRepo,
       this.ratingRepo,
       this.outboxRepo,
+      this.missionRepo,
+      this.missionRunRepo,
+      this.evidenceRepo,
+      this.artifactRepo,
+      this.decisionRepo,
+      this.approvalRepo,
+      this.mappingRepo,
     );
     return await work(uow);
   }

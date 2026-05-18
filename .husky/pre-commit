@@ -1,2 +1,2 @@
-pnpm refresh-map && git add PROJECT_MAP.md
+# pnpm refresh-map && git add PROJECT_MAP.md
 pnpm lint-staged

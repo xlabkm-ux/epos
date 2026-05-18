@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   GovernanceProcess,
+  GovernanceStatus,
   NodePatch,
   ReadinessAssessment,
   ArtifactVersion,
@@ -19,7 +20,8 @@ import {
   artifactVersions,
   traceEvents,
 } from "./schema.js";
-import { eq, sql, and } from "drizzle-orm";
+import { eq, sql, and, desc } from "drizzle-orm";
+import { redact } from "@epios/observability";
 
 export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
   constructor(private readonly db: PostgresJsDatabase) {}
@@ -76,7 +78,7 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
     return new GovernanceProcess({
       nodeId: record.nodeId,
       workspaceId: record.workspaceId,
-      status: record.status as ApprovalStatus,
+      status: record.status as GovernanceStatus,
       votes: record.votes as any[],
       requiredVotes: record.requiredVotes,
       createdAt: record.createdAt,
@@ -98,7 +100,7 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
         new GovernanceProcess({
           nodeId: record.nodeId,
           workspaceId: record.workspaceId,
-          status: record.status as ApprovalStatus,
+          status: record.status as GovernanceStatus,
           votes: record.votes as any[],
           requiredVotes: record.requiredVotes,
           createdAt: record.createdAt,
@@ -119,7 +121,7 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
         new GovernanceProcess({
           nodeId: record.nodeId,
           workspaceId: record.workspaceId,
-          status: record.status as ApprovalStatus,
+          status: record.status as GovernanceStatus,
           votes: record.votes as any[],
           requiredVotes: record.requiredVotes,
           createdAt: record.createdAt,
@@ -289,7 +291,11 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
       workspaceId: version.workspaceId,
       version: version.version,
       content: version.content,
+      contentHash: "",
+      patchId: version.patchId,
       authorId: version.authorId,
+      createdByType: "user",
+      createdById: version.authorId,
       createdAt: version.createdAt,
     });
   }
@@ -309,6 +315,7 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
       version: record.version,
       content: record.content,
       authorId: record.authorId,
+      patchId: record.patchId || undefined,
       createdAt: record.createdAt,
     }));
   }
@@ -318,21 +325,32 @@ export class PostgresGovernanceRepository implements GovernanceRepositoryPort {
       .select()
       .from(artifactVersions)
       .where(eq(artifactVersions.artifactId, artifactId))
-      .orderBy(artifactVersions.version); // Need to order by version desc
+      .orderBy(desc(artifactVersions.version))
+      .limit(1);
 
-    // Wait, Drizzle orderBy needs desc()
-    // Let me fix that.
-    return null; // Placeholder for now, I'll fix it in the next step or use a better query.
+    if (!record) return null;
+
+    return {
+      id: record.id,
+      artifactId: record.artifactId,
+      workspaceId: record.workspaceId,
+      version: record.version,
+      content: record.content,
+      authorId: record.authorId,
+      patchId: record.patchId || undefined,
+      createdAt: record.createdAt,
+    };
   }
 
   async saveTraceEvent(event: TraceEvent): Promise<void> {
+    const redactedMetadata = redact(event.metadata);
     await this.db.insert(traceEvents).values({
       id: event.id,
       workspaceId: event.workspaceId,
       type: event.type,
       actorId: event.actorId,
       targetId: event.targetId,
-      metadata: event.metadata,
+      metadata: redactedMetadata,
       timestamp: event.timestamp,
     });
   }

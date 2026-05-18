@@ -1,13 +1,6 @@
-export type UserRole = "observer" | "reviewer" | "admin";
+import { User, UserRole } from "./identity.js";
 
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: UserRole;
-  isActive: boolean;
-  createdAt: Date;
-}
+export type { User, UserRole };
 
 export interface Permission {
   action: string;

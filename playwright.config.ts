@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev --prefix apps/demo-shell",
+    command: "npm run dev --prefix apps/work-shell",
     url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },

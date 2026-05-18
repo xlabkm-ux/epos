@@ -18,11 +18,13 @@ export interface CreateWorkspaceDto {
 }
 
 export interface AddNodeDto {
+  missionId: string;
   type: NodeType;
   content: string;
   strength?: NodeStrength;
   evidence?: EvidenceRef[];
   metadata?: Record<string, unknown>;
+  createdById?: string;
 }
 
 export interface AddEdgeDto {
