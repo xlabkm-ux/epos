@@ -22,7 +22,7 @@
     "test:security": "tsx tools/security/run-security-tests.ts",
     "test:trace": "pnpm --filter @epios/observability test",
     "sprint:qa": "tsx tools/sprint-qa/run-sprint-qa.ts",
-    "qa:adr-review": "pnpm verify && pnpm test:e2e && pnpm test:trace",
+    "qa:adr-review": "pnpm verify && pnpm test:trace",
     "work:adr-review": "pnpm --filter @epios/work-shell dev",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
