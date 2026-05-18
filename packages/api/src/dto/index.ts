@@ -24,6 +24,7 @@ export interface AddNodeDto {
   strength?: NodeStrength;
   evidence?: EvidenceRef[];
   metadata?: Record<string, unknown>;
+  createdById?: string;
 }
 
 export interface AddEdgeDto {

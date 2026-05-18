@@ -114,7 +114,7 @@ describe("Readiness Domain Invariants", () => {
 
     expect(result.status).toBe("ready");
     expect(result.indicators.evidenceCoverage).toBe("high");
-    expect(result.indicators.traceability).toBe("complete");
+    expect(result.indicators.traceability).toBe("full");
     expect(result.indicators.riskHandling).toBe("explicit");
   });
 });

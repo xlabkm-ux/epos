@@ -30,6 +30,7 @@ export interface EpistemicNodeProps {
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  createdById?: string;
 }
 
 export class EpistemicNode {
@@ -83,6 +84,9 @@ export class EpistemicNode {
   }
   get updatedAt() {
     return this.props.updatedAt;
+  }
+  get createdById() {
+    return this.props.createdById;
   }
 
   public toJSON() {

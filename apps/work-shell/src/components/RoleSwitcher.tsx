@@ -233,6 +233,7 @@ export const RoleSwitcher: React.FC<{
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "flex-start",
                   gap: "10px",
                   padding: "8px 12px",
                   borderRadius: "8px",
@@ -266,6 +267,7 @@ export const RoleSwitcher: React.FC<{
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "flex-start",
                   gap: "10px",
                   padding: "8px 12px",
                   borderRadius: "8px",
@@ -307,6 +309,7 @@ export const RoleSwitcher: React.FC<{
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "flex-start",
                   gap: "10px",
                   padding: "8px 12px",
                   borderRadius: "8px",

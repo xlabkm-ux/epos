@@ -370,6 +370,11 @@ const Sidebar: React.FC = () => {
                   status={ws.status}
                   icon={<WsDot active={selectedWorkspaceId === ws.id} />}
                   label={ws.title}
+                  title={
+                    i18n.language === "ru"
+                      ? `Рабочее пространство: ${ws.title}\nСтатус: ${ws.status === "running" ? "Активно" : ws.status}\nПоследнее изменение: ${new Date(ws.updatedAt).toLocaleDateString("ru-RU")}`
+                      : `Workspace: ${ws.title}\nStatus: ${ws.status}\nLast updated: ${new Date(ws.updatedAt).toLocaleDateString()}`
+                  }
                 />
               ))}
           </div>

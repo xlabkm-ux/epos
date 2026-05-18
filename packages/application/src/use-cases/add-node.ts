@@ -16,6 +16,7 @@ export type AddNodeRequest = {
   strength?: NodeStrength;
   // evidence?: EvidenceRef[]; // TODO: Evidence is now handled via EvidenceSet
   metadata?: Record<string, unknown>;
+  createdById?: string;
 };
 
 export class AddNodeUseCase {
@@ -41,6 +42,7 @@ export class AddNodeUseCase {
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdById: request.createdById ?? "admin-1",
     });
 
     await this.graphRepo.saveNode(node);

@@ -34,9 +34,11 @@ export async function mappingRoutes(
   fastify.post<{ Params: { workspaceId: string }; Body: AddNodeDto }>(
     "/workspaces/:workspaceId/nodes",
     async (request, reply) => {
+      const createdById = (request.headers["x-user-id"] as string) || "admin-1";
       const node = await options.addNodeUseCase.execute({
         workspaceId: request.params.workspaceId,
         ...request.body,
+        createdById: request.body.createdById || createdById,
       });
       return reply.status(201).send(node);
     },

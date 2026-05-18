@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   doublePrecision,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const workspaces = pgTable("workspaces", {
@@ -571,3 +572,25 @@ export const mappingRuns = pgTable("mapping_runs", {
     .defaultNow(),
   completedAt: timestamp("completed_at", { withTimezone: true }),
 });
+
+export const userMapStates = pgTable(
+  "user_map_states",
+  {
+    id: uuid("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => identities.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    selectedNodeId: uuid("selected_node_id"),
+    viewport: jsonb("viewport").notNull().default({ x: 0, y: 0, zoom: 1 }),
+    nodesState: jsonb("nodes_state").notNull().default([]),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    uq: unique("uq_user_workspace").on(t.userId, t.workspaceId),
+  }),
+);

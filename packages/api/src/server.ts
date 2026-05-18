@@ -3,6 +3,8 @@ import cors from "@fastify/cors";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import * as dotenv from "dotenv";
+import { sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
 import {
   PostgresWorkspaceRepository,
   PostgresGraphRepository,
@@ -532,6 +534,73 @@ export async function buildServer(deps: ServerDependencies = {}) {
   app.register(identityRoutes, {
     prefix: "/api/v1",
     context: identityContext,
+  });
+
+  // Save and load workspace map states per user
+  app.post("/api/v1/users/map-state", async (request, reply) => {
+    const userId = (request.headers["x-user-id"] as string) || "observer-1";
+    const { workspaceId, selectedNodeId, viewport, nodes } = request.body as {
+      workspaceId: string;
+      selectedNodeId?: string | null;
+      viewport: { x: number; y: number; zoom: number };
+      nodes: Array<{ id: string; position: { x: number; y: number } }>;
+    };
+
+    if (!workspaceId) {
+      return reply.status(400).send({ error: "Missing workspaceId" });
+    }
+
+    if (isMockMode) {
+      const key = `${userId}:${workspaceId}`;
+      if (!(app as any).decoratorMapStates) {
+        (app as any).decoratorMapStates = new Map();
+      }
+      (app as any).decoratorMapStates.set(key, { selectedNodeId, viewport, nodes });
+      return reply.send({ success: true });
+    } else {
+      const db = (workspaceRepo as any).db;
+      const id = randomUUID();
+      
+      await db.execute(sql`
+        INSERT INTO user_map_states (id, user_id, workspace_id, selected_node_id, viewport, nodes_state, updated_at)
+        VALUES (${id}, ${userId}, ${workspaceId}, ${selectedNodeId || null}, ${JSON.stringify(viewport)}::jsonb, ${JSON.stringify(nodes)}::jsonb, NOW())
+        ON CONFLICT (user_id, workspace_id)
+        DO UPDATE SET
+          selected_node_id = EXCLUDED.selected_node_id,
+          viewport = EXCLUDED.viewport,
+          nodes_state = EXCLUDED.nodes_state,
+          updated_at = NOW()
+      `);
+      return reply.send({ success: true });
+    }
+  });
+
+  app.get("/api/v1/users/map-state", async (request, reply) => {
+    const userId = (request.headers["x-user-id"] as string) || "observer-1";
+    const { workspaceId } = request.query as { workspaceId: string };
+
+    if (!workspaceId) {
+      return reply.status(400).send({ error: "Missing workspaceId" });
+    }
+
+    if (isMockMode) {
+      const key = `${userId}:${workspaceId}`;
+      if (!(app as any).decoratorMapStates) {
+        (app as any).decoratorMapStates = new Map();
+      }
+      const state = (app as any).decoratorMapStates.get(key) || null;
+      return reply.send({ state });
+    } else {
+      const db = (workspaceRepo as any).db;
+      const rows = await db.execute(sql`
+        SELECT selected_node_id as "selectedNodeId", viewport, nodes_state as "nodesState"
+        FROM user_map_states
+        WHERE user_id = ${userId} AND workspace_id = ${workspaceId}
+      `);
+      
+      const record = rows[0] || null;
+      return reply.send({ state: record });
+    }
   });
 
   return app;

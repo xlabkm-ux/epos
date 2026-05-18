@@ -7,9 +7,9 @@ interface ReadinessAssessment {
   id: string;
   status: "ready" | "needs_review" | "blocked";
   indicators: {
-    evidenceCoverage: "high" | "medium" | "low";
-    traceability: "complete" | "partial" | "missing";
-    riskHandling: "explicit" | "weak" | "missing";
+    evidenceCoverage: "low" | "medium" | "high";
+    traceability: "missing" | "partial" | "full";
+    riskHandling: "absent" | "implicit" | "explicit";
   };
   numericScore: number;
   explanation: string;
@@ -98,8 +98,8 @@ export const ReadinessPanel: React.FC<{ workspaceId: string }> = ({
   };
 
   const getIndicatorColor = (val: string) => {
-    if (["high", "complete", "explicit"].includes(val)) return "var(--success)";
-    if (["medium", "partial", "weak"].includes(val)) return "var(--warning)";
+    if (["high", "full", "explicit"].includes(val)) return "var(--success)";
+    if (["medium", "partial", "implicit"].includes(val)) return "var(--warning)";
     return "var(--error)";
   };
 

@@ -251,9 +251,9 @@ export interface ReadinessAssessment {
   methodVersion: string;
   status: ReadinessStatus;
   indicators: {
-    evidenceCoverage: "high" | "medium" | "low";
-    traceability: "complete" | "partial" | "missing";
-    riskHandling: "explicit" | "weak" | "missing";
+    evidenceCoverage: "low" | "medium" | "high";
+    traceability: "missing" | "partial" | "full";
+    riskHandling: "absent" | "implicit" | "explicit";
   };
   numericScore?: number;
   explanation: string;

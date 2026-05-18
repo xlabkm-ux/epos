@@ -24,6 +24,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     "general" | "security" | "identity" | "admin"
   >("general");
 
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "system";
+  });
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.dataset.theme = newTheme;
+  };
+
   if (!isOpen) return null;
 
   const isAdmin =
@@ -38,147 +48,142 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "2rem",
+              gap: "24px",
               animation: "fadeIn 0.2s ease-out",
             }}
           >
-            <section>
-              <h3
+            {/* Language Selection */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label
                 style={{
-                  fontSize: "0.9rem",
-                  color: "var(--text-dim)",
-                  marginBottom: "1rem",
-                  textTransform: "uppercase",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "var(--text-main)",
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
                 }}
               >
-                <Globe size={14} />{" "}
-                {i18n.language === "ru"
-                  ? "Выбор Рабочего места (РМ / WP)"
-                  : "WorkPlace Selection"}
-              </h3>
-              <div
+                <Globe size={14} style={{ color: "var(--primary)" }} />
+                {i18n.language === "ru" ? "Язык интерфейса" : "Interface Language"}
+              </label>
+              <select
+                value={i18n.language}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
                 style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-main)",
+                  fontSize: "0.85rem",
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="ru" style={{ backgroundColor: "var(--bg-card)" }}>
+                  Русский
+                </option>
+                <option value="en" style={{ backgroundColor: "var(--bg-card)" }}>
+                  English
+                </option>
+              </select>
+            </div>
+
+            {/* Theme Selection */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "var(--text-main)",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <Palette size={14} style={{ color: "var(--primary)" }} />
+                {i18n.language === "ru" ? "Тема оформления" : "Theme Settings"}
+              </label>
+              <select
+                value={theme}
+                onChange={(e) => handleThemeChange(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-main)",
+                  fontSize: "0.85rem",
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="dark" style={{ backgroundColor: "var(--bg-card)" }}>
+                  {i18n.language === "ru" ? "Тёмная" : "Dark"}
+                </option>
+                <option value="light" style={{ backgroundColor: "var(--bg-card)" }}>
+                  {i18n.language === "ru" ? "Светлая" : "Light"}
+                </option>
+                <option value="system" style={{ backgroundColor: "var(--bg-card)" }}>
+                  {i18n.language === "ru" ? "Системная" : "System"}
+                </option>
+              </select>
+            </div>
+
+            {/* Active Workplace Selection */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "var(--text-main)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <Settings size={14} style={{ color: "var(--primary)" }} />
+                {i18n.language === "ru"
+                  ? "Активное рабочее место (WP)"
+                  : "Active WorkPlace (WP)"}
+              </label>
+              <select
+                value={activeWorkplace?.id || ""}
+                onChange={(e) => switchWorkplace(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-main)",
+                  fontSize: "0.85rem",
+                  outline: "none",
+                  cursor: "pointer",
                 }}
               >
                 {availableAssignments.map((wp) => (
-                  <button
+                  <option
                     key={wp.id}
-                    onClick={() => switchWorkplace(wp.id)}
-                    style={{
-                      width: "100%",
-                      padding: "16px",
-                      borderRadius: "12px",
-                      textAlign: "left",
-                      background:
-                        activeWorkplace?.id === wp.id
-                          ? "rgba(122, 162, 247, 0.1)"
-                          : "rgba(255,255,255,0.03)",
-                      border: "1px solid",
-                      borderColor:
-                        activeWorkplace?.id === wp.id
-                          ? "var(--primary)"
-                          : "var(--border)",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
+                    value={wp.id}
+                    style={{ backgroundColor: "var(--bg-card)" }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <div>
-                        <div
-                          style={{ fontWeight: 700, color: "var(--text-main)" }}
-                        >
-                          Assignment: {wp.id}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "var(--text-dim)",
-                            marginTop: "4px",
-                          }}
-                        >
-                          Unit ID: {wp.unitId || "N/A"} — Position ID:{" "}
-                          {wp.positionId || "N/A"} —{" "}
-                          <span style={{ color: "var(--primary)" }}>
-                            {wp.role}
-                          </span>
-                        </div>
-                        {wp.workspaceId && (
-                          <div
-                            style={{
-                              fontSize: "0.7rem",
-                              color: "var(--text-dim)",
-                              marginTop: "4px",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            Linked to Workspace: {wp.workspaceId}
-                          </div>
-                        )}
-                      </div>
-                      {activeWorkplace?.id === wp.id && (
-                        <div
-                          style={{
-                            background: "var(--primary)",
-                            color: "white",
-                            fontSize: "0.6rem",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            fontWeight: 800,
-                          }}
-                        >
-                          ACTIVE WP
-                        </div>
-                      )}
-                    </div>
-                  </button>
+                    {wp.id} ({wp.role}) — Unit: {wp.unitId || "N/A"}, Pos:{" "}
+                    {wp.positionId || "N/A"}
+                  </option>
                 ))}
                 {availableAssignments.length === 0 && (
-                  <div
-                    style={{
-                      padding: "20px",
-                      textAlign: "center",
-                      color: "var(--text-dim)",
-                      border: "1px dashed var(--border)",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    No assignments found for your account.
-                  </div>
+                  <option value="" style={{ backgroundColor: "var(--bg-card)" }}>
+                    {i18n.language === "ru"
+                      ? "Назначения отсутствуют"
+                      : "No assignments found"}
+                  </option>
                 )}
-              </div>
-            </section>
-
-            <section style={{ marginTop: "1rem", opacity: 0.5 }}>
-              <h3
-                style={{
-                  fontSize: "0.9rem",
-                  color: "var(--text-dim)",
-                  marginBottom: "1rem",
-                  textTransform: "uppercase",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                <Palette size={14} />{" "}
-                {i18n.language === "ru" ? "Тема оформления" : "Theme Settings"}
-              </h3>
-              <div style={{ fontSize: "0.8rem" }}>
-                System settings are managed by your administrator.
-              </div>
-            </section>
+              </select>
+            </div>
           </div>
         );
       case "security":
@@ -201,88 +206,63 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 gap: "8px",
               }}
             >
-              <User size={14} />{" "}
+              <User size={14} style={{ color: "var(--primary)" }} />
               {i18n.language === "ru" ? "Должность и Роль" : "Position & Role"}
             </h3>
 
             <div
               style={{
-                background: "rgba(255,255,255,0.03)",
-                padding: "24px",
-                borderRadius: "16px",
-                marginBottom: "2rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                padding: "20px",
+                borderRadius: "10px",
+                backgroundColor: "rgba(255,255,255,0.02)",
                 border: "1px solid var(--border)",
+                marginBottom: "24px",
               }}
             >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
-                }}
-              >
-                <div>
-                  <label
+              {[
+                {
+                  label: i18n.language === "ru" ? "Подразделение (Unit)" : "Unit",
+                  value: activeWorkplace?.toJSON().details.unitId || "—",
+                },
+                {
+                  label: i18n.language === "ru" ? "Должность (Position)" : "Position",
+                  value: activeWorkplace?.toJSON().details.positionId || "—",
+                },
+                {
+                  label: i18n.language === "ru" ? "Роль в РМ (WP Role)" : "WP Role",
+                  value: activeWorkplace?.role || "—",
+                  isPrimary: true,
+                },
+                {
+                  label: i18n.language === "ru" ? "Активное РП (Workspace)" : "Workspace",
+                  value: activeWorkplace?.workspaceId || "—",
+                },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    paddingBottom: "10px",
+                    borderBottom:
+                      idx < 3 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  <span style={{ color: "var(--text-dim)" }}>{item.label}</span>
+                  <span
                     style={{
-                      fontSize: "0.7rem",
-                      color: "var(--text-dim)",
-                      display: "block",
-                      marginBottom: "4px",
+                      fontWeight: 600,
+                      color: item.isPrimary ? "var(--primary)" : "var(--text-main)",
                     }}
                   >
-                    ПОДРАЗДЕЛЕНИЕ / UNIT
-                  </label>
-                  <div style={{ fontWeight: 600 }}>
-                    {activeWorkplace?.toJSON().details.unitId || "Not assigned"}
-                  </div>
+                    {item.value}
+                  </span>
                 </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "0.7rem",
-                      color: "var(--text-dim)",
-                      display: "block",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    ДОЛЖНОСТЬ / POSITION
-                  </label>
-                  <div style={{ fontWeight: 600 }}>
-                    {activeWorkplace?.toJSON().details.positionId ||
-                      "Not assigned"}
-                  </div>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "0.7rem",
-                      color: "var(--text-dim)",
-                      display: "block",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    РОЛЬ В РМ / WP ROLE
-                  </label>
-                  <div style={{ fontWeight: 600, color: "var(--primary)" }}>
-                    {activeWorkplace?.role || "Observer"}
-                  </div>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "0.7rem",
-                      color: "var(--text-dim)",
-                      display: "block",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    АКТИВНОЕ РП / WORKSPACE
-                  </label>
-                  <div style={{ fontWeight: 600 }}>
-                    {activeWorkplace?.workspaceId || "All accessible"}
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             <p

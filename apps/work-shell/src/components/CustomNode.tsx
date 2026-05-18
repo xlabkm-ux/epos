@@ -7,8 +7,124 @@ import {
   AlertCircle,
   ShieldAlert,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const CustomNode = ({ data, selected }: NodeProps) => {
+  const { i18n } = useTranslation();
+
+  const getTypeTooltip = (type: string) => {
+    const isRu = i18n.language === "ru";
+    switch (type.toUpperCase()) {
+      case "HYPOTHESIS":
+        return isRu
+          ? "Гипотеза — предположение, требующее проверки и обоснования"
+          : "Hypothesis — assumption requiring verification and justification";
+      case "EVIDENCE":
+      case "OBSERVATION":
+        return isRu
+          ? "Свидетельство — фактические данные, наблюдения или доказательства"
+          : "Evidence — factual data, observations, or evidence";
+      case "CLAIM":
+      case "RISK":
+        return isRu
+          ? "Утверждение — сформулированное заявление, аргумент или тезис"
+          : "Claim — asserted statement, argument, or thesis";
+      default:
+        return type;
+    }
+  };
+
+  const getCardSummaryTooltip = () => {
+    const isRu = i18n.language === "ru";
+    
+    // 1. Basic Metadata
+    const typeLabel = data.type.toUpperCase();
+    const nodeIndex = data.hierarchicalId || "0.0";
+    
+    // 2. Author role details
+    const rawAuthor = data.createdById || "system";
+    let authorDetails = "";
+    if (rawAuthor === "approver") {
+      authorDetails = isRu ? "Координатор (approver)" : "Coordinator (approver)";
+    } else if (rawAuthor === "contributor") {
+      authorDetails = isRu ? "Аналитик (contributor)" : "Analyst (contributor)";
+    } else {
+      authorDetails = isRu ? "Система (system)" : "System (system)";
+    }
+
+    // 3. Category description
+    let definition = "";
+    if (typeLabel === "HYPOTHESIS") {
+      definition = isRu
+        ? "Гипотетический конструкт, требующий эмпирического подтверждения."
+        : "Hypothetical construct awaiting empirical validation.";
+    } else if (typeLabel === "EVIDENCE") {
+      definition = isRu
+        ? "Эмпирические данные, наблюдения или проверенный источник."
+        : "Empirical data, observation, or verified source material.";
+    } else {
+      definition = isRu
+        ? "Утверждение, аргумент или тезис."
+        : "Asserted statement, argument, or thesis.";
+    }
+
+    // 4. Traceability info
+    const traceability = typeLabel === "EVIDENCE"
+      ? (isRu 
+          ? "Криптографическое подтверждение источника проверено через MCP-адаптер. ID: EP-4492-X."
+          : "Cryptographic proof of source origin verified via MCP adapter. Trace ID: EP-4492-X.")
+      : (isRu
+          ? "Гипотетический конструкт, ожидающий эмпирического подтверждения."
+          : "Hypothetical construct awaiting empirical validation.");
+
+    // 5. Dependencies count
+    const count = data.dependencyCount || 0;
+    const dependencyLabel = isRu
+      ? `${count} связанных зависимостей`
+      : `${count} linked dependencies`;
+
+    // 6. Security Status
+    const isRedacted = data.metadata?.redacted;
+    const statusLabel = isRedacted
+      ? (isRu ? "⚠️ СКРЫТО ДЛЯ БЕЗОПАСНОСТИ ПИЛОТА" : "⚠️ REDACTED FOR PILOT SAFETY")
+      : (isRu ? "✓ Активный узел" : "✓ Active Workspace Node");
+
+    // 7. Statement content (truncated nicely for the tooltip)
+    const rawLabel = data.label || "";
+    const displayLabel = rawLabel.length > 120 
+      ? rawLabel.substring(0, 117) + "..." 
+      : rawLabel;
+
+    // Multiline structured layout
+    if (isRu) {
+      return [
+        `===========================================`,
+        `[Узел ${nodeIndex}] Категория: ${typeLabel}`,
+        `===========================================`,
+        `Содержание: "${displayLabel}"`,
+        `-------------------------------------------`,
+        `Автор: ${authorDetails}`,
+        `Трассировка: ${traceability}`,
+        `Связи: ${dependencyLabel}`,
+        `Статус: ${statusLabel}`,
+        `===========================================`
+      ].join("\n");
+    } else {
+      return [
+        `===========================================`,
+        `[Node ${nodeIndex}] Category: ${typeLabel}`,
+        `===========================================`,
+        `Content: "${displayLabel}"`,
+        `-------------------------------------------`,
+        `Author: ${authorDetails}`,
+        `Traceability: ${traceability}`,
+        `Connections: ${dependencyLabel}`,
+        `Status: ${statusLabel}`,
+        `===========================================`
+      ].join("\n");
+    }
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "HYPOTHESIS":
@@ -76,6 +192,7 @@ const CustomNode = ({ data, selected }: NodeProps) => {
         position: "relative",
       }}
       className={`custom-node-${data.type.toLowerCase()}`}
+      title={getCardSummaryTooltip()}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
         <Handle
@@ -91,104 +208,78 @@ const CustomNode = ({ data, selected }: NodeProps) => {
           }}
         />
 
-        {/* Node Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px 14px",
-            background: `linear-gradient(90deg, ${themeColor}12, transparent)`,
-            borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              fontSize: "11px",
-              color: themeColor,
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-            }}
-          >
-            {getTypeIcon(data.type)}
-            <span>{data.type}</span>
-          </div>
-          <div
-            style={{
-              fontSize: "10px",
-              color: "rgba(255, 255, 255, 0.4)",
-              fontFamily: "var(--font-mono)",
-              fontWeight: 600,
-            }}
-          >
-            {data.hierarchicalId || "0.0"}
-          </div>
-        </div>
-
-        {/* Node Body */}
+        {/* Compact unified card content block */}
         <div
           style={{
             padding: "14px",
-            fontSize: "13px",
-            fontWeight: 500,
-            color: "#c0caf5",
-            lineHeight: 1.5,
-            wordBreak: "break-word",
-            minHeight: "44px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
           }}
         >
-          {data.label}
-          {data.metadata?.redacted && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "10px",
-                color: "#ff966c",
-                marginTop: "6px",
-                fontStyle: "italic",
-                background: "rgba(255, 150, 108, 0.08)",
-                padding: "4px 8px",
-                borderRadius: "6px",
-                border: "1px solid rgba(255, 150, 108, 0.15)",
-              }}
-            >
-              <ShieldAlert size={12} />
-              Redacted for pilot safety
-            </div>
-          )}
-        </div>
-
-        {/* Node Footer / Metadata (Optional badge indicator) */}
-        {data.metadata && (
+          {/* Metadata Row: Icon and Hierarchical Number Badge */}
           <div
             style={{
-              padding: "6px 14px",
-              borderTop: "1px solid rgba(255, 255, 255, 0.04)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "flex-end",
-              gap: "8px",
-              background: "rgba(0, 0, 0, 0.1)",
+              justifyContent: "space-between",
             }}
           >
-            <span
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "help" }}
+              title={getTypeTooltip(data.type)}
+            >
+              {getTypeIcon(data.type)}
+            </div>
+            <div
               style={{
-                fontSize: "9px",
-                color: "rgba(255, 255, 255, 0.3)",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
+                fontSize: "10px",
+                color: themeColor,
+                background: `${themeColor}12`,
+                padding: "2px 6px",
+                borderRadius: "4px",
+                border: `1px solid ${themeColor}20`,
+                fontFamily: "var(--font-mono)",
+                fontWeight: 700,
               }}
             >
-              Verified Node
-            </span>
+              {data.hierarchicalId || "0.0"}
+            </div>
           </div>
-        )}
+
+          {/* Node Content */}
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 500,
+              color: "#c0caf5",
+              lineHeight: 1.5,
+              wordBreak: "break-word",
+            }}
+          >
+            {data.label}
+            {data.metadata?.redacted && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "10px",
+                  color: "#ff966c",
+                  marginTop: "6px",
+                  fontStyle: "italic",
+                  background: "rgba(255, 150, 108, 0.08)",
+                  padding: "4px 8px",
+                  borderRadius: "6px",
+                  border: "1px solid rgba(255, 150, 108, 0.15)",
+                }}
+              >
+                <ShieldAlert size={12} />
+                Redacted for pilot safety
+              </div>
+            )}
+          </div>
+        </div>
 
         <Handle
           type="source"

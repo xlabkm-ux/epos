@@ -30,6 +30,7 @@ export class PostgresGraphRepository implements GraphRepositoryPort {
         createdAt: node.createdAt,
         updatedAt: node.updatedAt,
         version: 1,
+        createdById: node.createdById ?? "system",
       });
     } else {
       const result = await this.db
@@ -116,6 +117,7 @@ export class PostgresGraphRepository implements GraphRepositoryPort {
           createdAt: record.createdAt,
           updatedAt: record.updatedAt,
           version: record.version,
+          createdById: record.createdById,
         }),
     );
   }
@@ -157,6 +159,7 @@ export class PostgresGraphRepository implements GraphRepositoryPort {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       version: record.version,
+      createdById: record.createdById,
     });
   }
 
@@ -196,6 +199,7 @@ export class PostgresGraphRepository implements GraphRepositoryPort {
           createdAt: record.createdAt,
           updatedAt: record.updatedAt,
           version: record.version,
+          createdById: record.createdById,
         }),
     );
   }
