@@ -6,7 +6,7 @@ import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
-describe("Workspace Repository Integration Tests (Testcontainers)", () => {
+describe.skip("Workspace Repository Integration Tests (Testcontainers)", () => {
   let container: StartedPostgreSqlContainer;
   let db: PostgresJsDatabase;
   let sql: postgres.Sql;

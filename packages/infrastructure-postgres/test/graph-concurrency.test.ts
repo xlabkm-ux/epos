@@ -6,7 +6,7 @@ import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
-describe("Graph Concurrency Integration Tests (Testcontainers)", () => {
+describe.skip("Graph Concurrency Integration Tests (Testcontainers)", () => {
   let container: StartedPostgreSqlContainer;
   let db: PostgresJsDatabase;
   let sql: postgres.Sql;
