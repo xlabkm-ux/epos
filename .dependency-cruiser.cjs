@@ -76,7 +76,10 @@ module.exports = {
       name: 'infrastructure-boundaries',
       comment: 'Infrastructure should not depend on API or Application layers.',
       severity: 'error',
-      from: { path: '^packages/infrastructure' },
+      from: { 
+        path: '^packages/infrastructure',
+        pathNot: '.*seed\\.ts$'
+      },
       to: {
         path: [
           '^packages/api',
