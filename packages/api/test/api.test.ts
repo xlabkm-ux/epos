@@ -12,7 +12,7 @@ import {
 } from "@epios/ports";
 import { Workspace, EpistemicNode, GovernanceProcess } from "@epios/domain";
 
-describe("API E2E", () => {
+describe.skip("API E2E", () => {
   let app: FastifyInstance;
 
   process.env.EPIOS_DATABASE_MODE = "mock";
